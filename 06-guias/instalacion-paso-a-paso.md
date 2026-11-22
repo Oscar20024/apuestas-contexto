@@ -1,6 +1,11 @@
 # Instalación paso a paso
 
 Orden recomendado. Cada fase se puede probar antes de pasar a la siguiente.
+Detalle de cada conexión (qué dato, dónde va, errores típicos): [conexiones.md](conexiones.md).
+
+Herramientas que te ayudan en todo el camino:
+- `apuestas configurar`: arma el `.env` pidiéndote cada dato y prueba la base de datos al momento.
+- `apuestas verificar`: revisa todo y te dice cómo arreglar lo que falle.
 
 - [ ] **A.** GitHub y prueba en tu PC (sin gastar nada)
 - [ ] **B.** Supabase
@@ -56,28 +61,33 @@ ahí vemos si hay alguna señal de ventaja y ajustamos los umbrales.
 
 ## B. Supabase
 
-### B1. Crear el proyecto
-- supabase.com → **New project**
-- Nombre: `apuestas` · Región: **South America (São Paulo)** (la más cercana a Perú)
-- Guarda la contraseña de la base de datos en un gestor de contraseñas.
+### B1. Elegir el proyecto
+Tu cuenta gratis ya tiene 2 proyectos activos (el máximo del plan gratis). Opciones en
+[conexiones.md → Supabase](conexiones.md#1-supabase):
+- **A.** Pausar uno y crear `apuestas` (región **South America (São Paulo)**) → `DB_SCHEMA=public`.
+- **B.** Usar un proyecto existente → `DB_SCHEMA=apuestas` (las tablas quedan aparte).
 
-### B2. Cadena de conexión
-Botón **Connect** (arriba) → pestaña de cadenas de conexión → **Session pooler**. Se ve así:
+### B2. Cadena de conexión y `.env`
+Botón **Connect** (arriba) → **Session pooler**. Se ve así:
 
 ```
 postgresql://postgres.<ref>:<CONTRASEÑA>@aws-0-sa-east-1.pooler.supabase.com:5432/postgres
 ```
 
-En tu PC: copia `.env.example` como `.env` y pega la cadena en `DATABASE_URL`.
+En tu PC, dentro de `apuestas-sistema`:
+```bash
+apuestas configurar
+```
+Pega la cadena (te dice al instante si conecta), elige el esquema, y deja la API key de OddsPapi
+vacía por ahora si aún no la tienes. El token de la API se genera solo.
 
 ### B3. Crear las tablas
-Opción 1 (desde tu PC):
 ```bash
 apuestas migrar
+apuestas verificar
 ```
-Opción 2: Supabase → **SQL Editor** → pegar `supabase/migrations/0001_esquema_inicial.sql` → **Run**.
-
-Comprueba en **Table Editor** que hay 11 tablas.
+`migrar` solo aplica lo que falte (se puede correr las veces que quieras).
+`verificar` debe mostrar "Tablas: OK" y avisos de "Sin historial cargado" (normal en este punto).
 
 ### B4. Cargar historial y entrenar (desde tu PC, para probar)
 ```bash
@@ -91,15 +101,15 @@ En Supabase deberías ver partidos en `partidos` y 3 filas en `modelos`.
 ## C. OddsPapi
 
 ### C1. Cuenta
-oddspapi.io → crear cuenta → copiar la **API key** → `ODDSPAPI_API_KEY` en `.env`.
+oddspapi.io → crear cuenta → copiar la **API key** → `apuestas configurar` (paso 3).
 
-### C2. Verificar formato e IDs (usa ~4 de tus 250 consultas)
+### C2. Verificar key, IDs y formato (usa ~3 de tus 250 consultas)
 ```bash
-apuestas listar-torneos --buscar italy
-apuestas listar-torneos --buscar peru
+apuestas verificar --con-oddspapi
 apuestas probar-oddspapi --torneo 17 --casa apuestatotal
 apuestas probar-oddspapi --torneo 17 --casa pinnacle
 ```
+`verificar --con-oddspapi` muestra el nombre del torneo de cada ID: confirma que cada uno es la liga correcta.
 Sigue la lista de chequeo de `05-operacion/runbook.md` → "Primera conexión con OddsPapi".
 Corrige en `config/ligas.yaml` los IDs marcados como `VERIFICAR`.
 
@@ -140,14 +150,14 @@ git clone git@github-apuestas:<tu-usuario>/apuestas-sistema.git ~/apuestas-siste
 ```
 
 ### D3. Configurar y levantar
+Lo más simple: usar el mismo `.env` que armaste en tu PC (pegando su contenido, nunca por GitHub).
 ```bash
 cd ~/apuestas-sistema
-cp .env.example .env
-python3 -c "import secrets; print(secrets.token_urlsafe(32))"   # copiar como API_TOKEN
-nano .env                                                       # DATABASE_URL, ODDSPAPI_API_KEY, API_TOKEN
+nano .env                  # pegar el contenido del .env de tu PC
 chmod 600 .env
 docker compose up -d --build
 curl http://127.0.0.1:8010/salud
+docker compose exec apuestas-api python -m apuestas verificar
 ```
 
 ### D4. Primera carga (si no la hiciste desde tu PC)
@@ -166,14 +176,14 @@ cd ~/apuestas-sistema && git pull && docker compose up -d --build
 
 ## E. n8n y WhatsApp
 
-Seguir `apuestas-sistema/n8n/README.md`:
+Seguir `apuestas-sistema/n8n/README.md`. En corto:
 1. Credencial **Header Auth** `Apuestas API` con el mismo `API_TOKEN`.
-2. Importar los 5 flujos.
-3. En cada nodo **Config**: `api_url` (`http://127.0.0.1:8010` o `http://apuestas-api:8000` si n8n está en Docker) y `envio_url`.
-4. Ajustar el nodo **Enviar a WhatsApp (OpenClaw)** a cómo recibe mensajes OpenClaw (pendiente).
-5. Probar cada flujo con **Execute workflow**. Luego activarlos.
+2. Importar **primero el flujo 98** (envío) y completar su nodo **Config envio**: modo y tu número.
+3. Importar 00, 01, 02, 03, 04 y 99. En cada uno: `api_url` en **Config** y elegir el flujo 98 en **Enviar por WhatsApp**.
+4. Ejecutar **Apuestas 00 - Prueba de conexiones**. Si te llega el mensaje, activar 01–04 y 99.
 
-Si n8n está en Docker, hay que unir ambos contenedores a la misma red: ver comentarios en `docker-compose.yml`.
+Si n8n está en Docker, hay que unir ambos contenedores a la misma red (ver `docker-compose.yml`)
+y usar el modo de envío `webhook_openclaw`.
 
 ---
 

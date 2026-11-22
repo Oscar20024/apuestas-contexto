@@ -15,7 +15,7 @@ El código vive en otro repositorio: **`apuestas-sistema`** (es lo que se despli
 | [03-datos](03-datos/modelo-de-datos.md) | Tablas de Supabase y fuentes de datos |
 | [04-modelo](04-modelo/modelo-y-embudo.md) | Cómo predice el modelo y cómo decide el embudo; cómo leer un backtest |
 | [05-operacion](05-operacion/calendario-y-consultas.md) | Calendario, presupuesto de consultas, qué hacer si algo falla |
-| [06-guias](06-guias/instalacion-paso-a-paso.md) | Instalación paso a paso |
+| [06-guias](06-guias/instalacion-paso-a-paso.md) | Instalación paso a paso y [conexiones](06-guias/conexiones.md) |
 | [preguntas-abiertas.md](preguntas-abiertas.md) | Lo que falta definir |
 | [bitacora.md](bitacora.md) | Historial de cambios del proyecto |
 

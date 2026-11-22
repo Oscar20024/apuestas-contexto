@@ -12,3 +12,5 @@ Si una decisión cambia, no se borra el archivo: se crea uno nuevo que la reempl
 | [0005](0005-valor-no-probabilidad.md) | Decidir por valor esperado, no por probabilidad alta | Aceptada |
 | [0006](0006-mensajes-con-plantilla-fija.md) | Mensajes con plantilla fija (Gemini no toca números) | Aceptada |
 | [0007](0007-fuentes-de-datos.md) | Fuentes: football-data.co.uk + OddsPapi | Aceptada |
+| [0008](0008-esquema-configurable.md) | Esquema de base de datos configurable (`DB_SCHEMA`) | Aceptada |
+| [0009](0009-envio-centralizado.md) | Envío de mensajes centralizado en el flujo 98 de n8n | Aceptada |

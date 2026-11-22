@@ -9,7 +9,7 @@ Sistema personal de Oscar que busca apuestas de **ganador del partido (1X2)** co
 - Código: repositorio `apuestas-sistema` (Python 3.12, FastAPI, Docker).
 - Datos: Supabase (Postgres).
 - Orquestación: n8n en un VPS de Hostinger.
-- Mensajes: OpenClaw (con Gemini) → WhatsApp. Más adelante, quizás una app Android.
+- Mensajes: n8n (flujo 98) → OpenClaw → WhatsApp. Más adelante, quizás una app Android.
 - Zona horaria: America/Lima. Moneda: soles (PEN).
 
 ## Reglas que no se rompen
@@ -35,10 +35,12 @@ Sistema personal de Oscar que busca apuestas de **ganador del partido (1X2)** co
 | Ver las tablas | `03-datos/modelo-de-datos.md` y `apuestas-sistema/supabase/migrations/` |
 | Cambiar umbrales | `apuestas-sistema/config/estrategia.yaml` (+ backtest + bitácora) |
 | Agregar una liga | `apuestas-sistema/config/ligas.yaml` + `05-operacion/runbook.md` |
+| Conectar un servicio | `06-guias/conexiones.md` |
 | Lo que falta decidir | `preguntas-abiertas.md` |
 
 ## Cómo trabajar
 
-- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (35 pruebas).
+- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (51 pruebas).
+- Si algo de conexión falla: `apuestas verificar` antes de tocar código.
 - Después de un cambio importante: anotar en `bitacora.md` (fecha, qué, por qué).
 - Si una decisión cambia la arquitectura: crear un nuevo ADR en `02-decisiones/`.

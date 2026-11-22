@@ -1,6 +1,10 @@
 # Modelo de datos (Supabase)
 
-Script: `apuestas-sistema/supabase/migrations/0001_esquema_inicial.sql`
+Script: `apuestas-sistema/supabase/migrations/0001_esquema_inicial.sql` (se aplica con `apuestas migrar`).
+
+Las tablas viven en el esquema de `DB_SCHEMA` (`public` si el proyecto es solo para esto;
+`apuestas` si se comparte un proyecto). La tabla `migraciones_aplicadas` registra qué migraciones
+ya se aplicaron. En el SQL Editor de un proyecto compartido, empieza con `set search_path to apuestas;`.
 
 ```mermaid
 erDiagram

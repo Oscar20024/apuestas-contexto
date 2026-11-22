@@ -1,5 +1,14 @@
 # Runbook: qué hacer cuando…
 
+## Primer paso ante cualquier problema
+
+```bash
+docker compose exec apuestas-api python -m apuestas verificar     # en el VPS
+apuestas verificar                                                # en tu PC
+```
+Revisa .env, Supabase, football-data y el uso de OddsPapi, y dice cómo arreglar cada error.
+Desde n8n, el flujo **00 - Prueba de conexiones** hace lo mismo y te manda el resultado por WhatsApp.
+
 ## …llega un mensaje "FALLO en Apuestas 0X"
 
 1. En el VPS: `cd ~/apuestas-sistema && docker compose logs --tail 100`
@@ -13,6 +22,13 @@
 | `could not connect to server` / timeout | Supabase pausado o URL mal | Abrir el proyecto en Supabase (lo despierta); revisar `DATABASE_URL` |
 | `Liga X sin modelo entrenado` | No corrió el entrenamiento | `docker compose exec apuestas-api python -m apuestas entrenar` |
 | `Historial insuficiente` | Liga nueva sin historial | `... python -m apuestas historial --ligas X` y luego entrenar |
+
+## …no llegan mensajes a WhatsApp
+
+1. En n8n, abrir la última ejecución del flujo **98 - Enviar mensaje** y ver qué nodo falló.
+2. Modo `comando`: probar por SSH `openclaw message send --channel whatsapp --target +51... --message "prueba"`.
+   Si funciona por SSH pero no desde n8n: el nodo *Execute Command* está desactivado o n8n corre con otro usuario.
+3. Modo `webhook_openclaw`: revisar `hooks.enabled`, el token de la credencial `OpenClaw Hooks` y `openclaw logs --follow`.
 
 ## …el resumen dice "nombres de equipos por revisar"
 
