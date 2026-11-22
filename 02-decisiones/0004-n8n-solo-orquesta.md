@@ -1,6 +1,6 @@
 # 0004 · n8n solo orquesta; el cálculo vive en la API
 
-**Estado:** Aceptada · **Fecha:** 2026-11-22
+**Estado:** Aceptada · **Fecha:** 2026-11-22 · Nota: desde [0010](0010-programador-systemd-y-mensajero.md) el orquestador es systemd; n8n es opcional. El principio no cambia.
 
 ## Decisión
 n8n solo hace tres cosas: disparar horarios, llamar a `apuestas-api` y reenviar los mensajes. Toda la lógica (modelo, embudo, límites, mensajes) está en Python, versionada y con pruebas.

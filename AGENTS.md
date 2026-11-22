@@ -8,8 +8,9 @@ Sistema personal de Oscar que busca apuestas de **ganador del partido (1X2)** co
 
 - Código: repositorio `apuestas-sistema` (Python 3.12, FastAPI, Docker).
 - Datos: Supabase (Postgres).
-- Orquestación: n8n en un VPS de Hostinger.
-- Mensajes: n8n (flujo 98) → OpenClaw → WhatsApp. Más adelante, quizás una app Android.
+- Orquestación: timers de systemd en el VPS de Hostinger (`srv1864174`). n8n es opcional y no está instalado.
+- Mensajes: la API los deja en `mensajes_salida`; `vps/apuestas_host.py` los entrega con `docker exec openclaw-wr93-openclaw-1 openclaw message send`. Más adelante, quizás una app Android.
+- Base de datos: proyecto Supabase `BDapuestas` (esquema `public`).
 - Zona horaria: America/Lima. Moneda: soles (PEN).
 
 ## Reglas que no se rompen
@@ -24,7 +25,8 @@ Sistema personal de Oscar que busca apuestas de **ganador del partido (1X2)** co
 6. **Límites de riesgo siempre activos:** tope por apuesta (2%), exposición semanal (10%),
    pausa automática al perder 15% del fondo en el mes.
 7. **Presupuesto de API:** OddsPapi gratis = 250 consultas/mes. El cliente bloquea al llegar a 230.
-8. **Secretos solo en `.env`** (nunca en GitHub): `DATABASE_URL`, `ODDSPAPI_API_KEY`, `API_TOKEN`.
+8. **Secretos solo en `.env`** (nunca en GitHub): `DATABASE_URL`, `ODDSPAPI_API_KEY`, `API_TOKEN`. En el VPS, además, `/etc/apuestas/host.env` (600).
+9. **La API nunca envía mensajes ni recibe acceso a Docker.** Solo el mensajero del VPS toca WhatsApp.
 
 ## Dónde está cada cosa
 
@@ -40,7 +42,7 @@ Sistema personal de Oscar que busca apuestas de **ganador del partido (1X2)** co
 
 ## Cómo trabajar
 
-- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (51 pruebas).
+- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (58 pruebas).
 - Si algo de conexión falla: `apuestas verificar` antes de tocar código.
 - Después de un cambio importante: anotar en `bitacora.md` (fecha, qué, por qué).
 - Si una decisión cambia la arquitectura: crear un nuevo ADR en `02-decisiones/`.

@@ -1,6 +1,8 @@
 # Modelo de datos (Supabase)
 
-Script: `apuestas-sistema/supabase/migrations/0001_esquema_inicial.sql` (se aplica con `apuestas migrar`).
+Proyecto: **`BDapuestas`** (Supabase, us-west-2), esquema `public`. Tablas creadas el 2026-11-22.
+
+Scripts: `apuestas-sistema/supabase/migrations/0001_esquema_inicial.sql` y `0002_bandeja_mensajes.sql` (se aplican con `apuestas migrar`).
 
 Las tablas viven en el esquema de `DB_SCHEMA` (`public` si el proyecto es solo para esto;
 `apuestas` si se comparte un proyecto). La tabla `migraciones_aplicadas` registra qué migraciones
@@ -33,6 +35,8 @@ erDiagram
 | `apuestas_realizadas` | Lo que apostaste de verdad | Tú (comando o endpoint) |
 | `ejecuciones` | Registro de cada corrida (ok / error) | Sistema |
 | `uso_api` | Cada consulta a OddsPapi (para no pasar el límite) | Sistema |
+| `mensajes_salida` | Bandeja: cada mensaje por entregar (alerta, resumen, prueba), su estado e intentos | API escribe; mensajero del VPS marca |
+| `migraciones_aplicadas` | Qué migraciones ya se aplicaron | `apuestas migrar` |
 
 ### `cuotas.casa` y `cuotas.tipo`
 

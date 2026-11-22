@@ -2,6 +2,32 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-22 · v1.2.0 — adaptado al VPS real (sin n8n) y tablas creadas en Supabase
+
+**Por qué:** n8n no está instalado, y OpenClaw corre en Docker y se maneja con `docker exec`
+(según el inventario del VPS y el manual técnico v1.1 de memory-api). Gemini falla seguido (503, 429, 404).
+
+**Supabase**
+- Proyecto `BDapuestas` (us-west-2): aplicadas las migraciones 0001 y 0002 (13 tablas, RLS en todas).
+  Asesor de seguridad: solo el aviso informativo "RLS sin políticas", que es lo esperado.
+
+**Sistema**
+- Bandeja de salida `mensajes_salida` (migración 0002): la API deja los mensajes, nunca los envía.
+  Las alertas caducan al empezar el partido; hasta 5 reintentos.
+- `POST /tareas/{lunes|entre_semana|viernes|fin_de_semana|prueba}`, `GET /mensajes/pendientes`,
+  `POST /mensajes/{id}/resultado`. Comando `apuestas tarea <nombre>`.
+- `vps/apuestas_host.py` (solo biblioteca estándar): programador y mensajero. Envía con
+  `docker exec openclaw-wr93-openclaw-1 openclaw message send` sin shell. Si la API cae, avisa directo.
+- Timers de systemd con hora de Lima (`vps/systemd/`) e instalador `vps/instalar.sh`.
+- Docker endurecido para el VPS: solo `127.0.0.1`, UID 10001, solo lectura, sin capacidades, 768 MB / 0.5 CPU.
+- n8n pasa a ser opcional (flujos que solo llaman a `/tareas/...`). Se quitan los flujos 98 y 99.
+- 58 pruebas (antes 51).
+
+**Probado:** de punta a punta con la API real, Postgres y un `docker` simulado: WhatsApp caído →
+reintento → enviado; API caída → aviso directo. Expresiones de calendario validadas con `systemd-analyze`.
+
+**No probado aún:** `docker exec ... message send` en el VPS real, timers en el VPS real, conexión a Supabase con tu contraseña.
+
 ## 2026-11-22 · v1.1.0 — listo para conectar los servicios
 
 **Por qué:** la v1.0 tenía toda la lógica, pero conectar cada servicio dependía de editar a mano y

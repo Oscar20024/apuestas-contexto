@@ -39,7 +39,7 @@ Si después de 8 semanas el CLV es negativo, el modelo no tiene ventaja: se ajus
 
 | Fase | Contenido | Estado |
 |---|---|---|
-| 1 | Sistema base: datos, modelo, embudo, backtest, API, n8n, WhatsApp | v1.0 lista (sin desplegar) |
+| 1 | Sistema base: datos, modelo, embudo, backtest, API, programador, mensajero, WhatsApp | v1.2 lista; tablas creadas en Supabase |
 | 2 | Despliegue en VPS + Supabase + modo prueba | Pendiente |
 | 3 | Ajuste de umbrales con datos reales, más ligas | Pendiente |
 | 4 | App Android (panel de rendimiento + notificaciones) | Idea |

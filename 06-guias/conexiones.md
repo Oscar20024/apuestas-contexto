@@ -1,133 +1,112 @@
 # Conexiones: qué necesita cada servicio
 
-El sistema queda listo para conectarse. Esta hoja dice, por servicio, **qué dato hace falta,
-dónde va y cómo comprobar que funciona**.
+Estado al 2026-11-22. Por servicio: qué dato hace falta, dónde va y cómo comprobarlo.
 
 ## Resumen
 
-| # | Servicio | Dato que necesitas | Dónde va | Cómo compruebo |
-|---|---|---|---|---|
-| 1 | Supabase | Cadena "Session pooler" | `.env` → `DATABASE_URL` (+ `DB_SCHEMA`) | `apuestas verificar` |
-| 2 | OddsPapi | API key | `.env` → `ODDSPAPI_API_KEY` | `apuestas verificar --con-oddspapi` (gasta 1) |
-| 3 | API del sistema | Token (se genera solo) | `.env` → `API_TOKEN` y credencial `Apuestas API` en n8n | Flujo 00 de n8n |
-| 4 | n8n → API | URL de la API | Nodo **Config** de cada flujo | Flujo 00 de n8n |
-| 5 | n8n → WhatsApp | Modo de envío + tu número | Nodo **Config envio** del flujo 98 | Flujo 00 de n8n (te llega un mensaje) |
-| 6 | football-data | Nada (es público) | — | `apuestas verificar` |
-
-Atajo para los 3 primeros: **`apuestas configurar`** pide cada dato, prueba la base de datos al
-momento y genera el token.
+| # | Conexión | Estado | Dato que falta | Dónde va | Cómo compruebo |
+|---|---|---|---|---|---|
+| 1 | API → Supabase | **Tablas creadas** en `BDapuestas` | Cadena "Session pooler" con tu contraseña | `.env` → `DATABASE_URL` | `apuestas verificar` |
+| 2 | API → OddsPapi | Pendiente | API key | `.env` → `ODDSPAPI_API_KEY` | `apuestas verificar --con-oddspapi` (gasta 1) |
+| 3 | Programador/mensajero → API | Listo en el código | Token (se genera solo) | `.env` y `/etc/apuestas/host.env` | `python3 vps/apuestas_host.py estado` |
+| 4 | Mensajero → OpenClaw → WhatsApp | Listo en el código | Tu número | `/etc/apuestas/host.env` (lo pide `instalar.sh`) | `python3 vps/apuestas_host.py probar-whatsapp` |
+| 5 | API → football-data | No necesita nada | — | — | `apuestas verificar` |
+| — | n8n | **No hace falta** | — | — | Ver [n8n opcional](#n8n-opcional) |
 
 ```mermaid
 flowchart LR
-    subgraph VPS
-        N8N[n8n] -- "X-API-Token (3)<br/>api_url (4)" --> API[apuestas-api]
-        N8N -- "flujo 98 (5)" --> OC[OpenClaw]
+    subgraph VPS["VPS srv1864174"]
+        T[systemd timers<br/>hora de Lima] --> H[apuestas_host.py]
+        H -- "X-API-Token (3)" --> API[apuestas-api<br/>Docker · 127.0.0.1:8010]
+        H -- "docker exec ... message send (4)" --> OC[OpenClaw<br/>openclaw-wr93-openclaw-1]
     end
-    API -- "DATABASE_URL (1)" --> SB[(Supabase)]
+    API -- "DATABASE_URL (1)" --> SB[(Supabase<br/>BDapuestas)]
     API -- "ODDSPAPI_API_KEY (2)" --> OP[OddsPapi]
-    API -- "(6)" --> FD[football-data]
+    API -- "(5)" --> FD[football-data]
     OC --> WA[WhatsApp]
 ```
 
 ---
 
-## 1. Supabase
+## 1. Supabase (`BDapuestas`)
 
-### Decisión pendiente: ¿qué proyecto usar?
+**Hecho:** las 13 tablas están creadas en el esquema `public` del proyecto `BDapuestas`, con RLS
+activado en todas (sin políticas: nadie puede leerlas desde la API pública de Supabase; el sistema
+entra como `postgres`). El asesor de seguridad solo muestra el aviso informativo "RLS sin políticas",
+que es lo esperado.
 
-Tu organización de Supabase está en el **plan gratis** y ya tiene **2 proyectos activos**
-(`saas-dev` y `movil-negocios`). El plan gratis permite 2 proyectos activos, así que para crear
-uno nuevo hay que elegir:
-
-| Opción | Qué haces | `DB_SCHEMA` | A favor | En contra |
-|---|---|---|---|---|
-| **A. Proyecto nuevo** | Pausar uno de los dos y crear `apuestas` | `public` | Todo separado, 500 MB propios | Un proyecto queda pausado |
-| **B. Proyecto existente** | Usar uno de los dos que ya tienes | `apuestas` | Sin pausar nada, listo hoy | Comparte los 500 MB y el panel con ese sistema |
-| C. Plan Pro | Pagar el plan Pro | `public` | Sin límites prácticos | Costo mensual |
-
-El sistema funciona igual en las tres. Con la opción B todas sus tablas quedan en el esquema
-`apuestas` y no tocan las de `public`.
-
-### Pasos
-1. Supabase → el proyecto elegido → botón **Connect** → **Session pooler** (puerto 5432).
-2. Copia la cadena y cambia `[YOUR-PASSWORD]` por la contraseña de la base de datos.
-   ¿No la recuerdas? *Project Settings → Database → Reset database password*.
+**Falta (solo tú puedes hacerlo, porque lleva tu contraseña):**
+1. Supabase → `BDapuestas` → botón **Connect** → **Session pooler**.
+2. Copia la cadena y cambia `[YOUR-PASSWORD]` por la contraseña de la base de datos
+   (¿no la recuerdas? *Project Settings → Database → Reset database password*).
 3. En tu PC, dentro de `apuestas-sistema`:
    ```bash
-   apuestas configurar     # pega la cadena; DB_SCHEMA = public (A/C) o apuestas (B)
-   apuestas migrar         # crea las 11 tablas (+ registro de migraciones)
+   apuestas configurar     # pega la cadena; DB_SCHEMA = public
+   apuestas migrar         # debe decir "No habia migraciones pendientes"
    apuestas verificar
    ```
+
+El proyecto está en la región **us-west-2**. Funciona igual; solo agrega algo de latencia (unos
+segundos más por escaneo), sin impacto en el uso.
 
 ### Errores típicos
 | Mensaje | Arreglo |
 |---|---|
 | `password authentication failed` | Contraseña incorrecta: resetearla en Supabase. |
-| `Tenant or user not found` | En el pooler el usuario es `postgres.<ref>`; copia la cadena completa. |
+| `Tenant or user not found` | En el pooler el usuario es `postgres.luxfvuxhnxcqijsgmuee`; copia la cadena completa. |
 | `Network is unreachable` / host `db.xxx.supabase.co` | Es la conexión directa (IPv6). Usa **Session pooler**. |
 | Puerto `6543` | Es el *Transaction pooler*: cambia a 5432. |
-| Timeout | Proyecto pausado: ábrelo en el panel para reactivarlo. |
 
 ---
 
 ## 2. OddsPapi
 
 1. Crear cuenta en oddspapi.io y copiar la **API key**.
-2. `apuestas configurar` (paso 3) o pegarla en `.env` → `ODDSPAPI_API_KEY`.
-3. `apuestas verificar --con-oddspapi` → gasta **1 consulta** y comprueba la key **y** que los IDs
-   de las ligas activas existan (muestra el nombre de cada torneo para que confirmes que es el correcto).
-4. `apuestas probar-oddspapi --torneo 17` → 1 consulta más; revisa la lista de chequeo de
-   `05-operacion/runbook.md` → "Primera conexión con OddsPapi".
+2. `apuestas configurar` (paso 3).
+3. `apuestas verificar --con-oddspapi`: gasta **1 consulta** y comprueba la key y que cada ID de liga
+   corresponda al torneo correcto.
+4. `apuestas probar-oddspapi --torneo 17`: revisa la lista de `05-operacion/runbook.md` →
+   "Primera conexión con OddsPapi".
 
 ---
 
-## 3 y 4. n8n → API
+## 3 y 4. Programador, mensajero y WhatsApp
 
-- La API corre en Docker en el VPS y solo escucha en `127.0.0.1:8010`.
-- **¿Cómo está instalado tu n8n?** (pregunta abierta):
-  - Directo en el VPS (npm/pm2): `api_url = http://127.0.0.1:8010`.
-  - En Docker: unir los contenedores a la misma red (ver `docker-compose.yml`) y usar
-    `api_url = http://apuestas-api:8000`.
-- Credencial **Header Auth** `Apuestas API`: Name `X-API-Token`, Value = `API_TOKEN` del `.env`.
+Tu VPS ya tiene OpenClaw en Docker (`openclaw-wr93-openclaw-1`) y lo administras con
+`docker exec ... openclaw ...`. El mensajero usa ese mismo camino:
 
----
-
-## 5. n8n → WhatsApp (OpenClaw)
-
-Todo sale por el flujo **98 - Enviar mensaje**. Se configura una vez en su nodo **Config envio**.
-
-| Modo | Cómo entrega | Requisito | Exactitud del texto |
-|---|---|---|---|
-| `comando` (recomendado) | `openclaw message send --channel whatsapp --target +51...` | n8n instalado directo en el VPS, mismo usuario que OpenClaw; nodo *Execute Command* habilitado | Exacta: no pasa por Gemini |
-| `webhook_openclaw` | POST a `/hooks/agent` del Gateway con `channel: whatsapp` y `to: +51...` | `hooks.enabled: true` y `hooks.token` en la config de OpenClaw; credencial `OpenClaw Hooks` en n8n | Pasa por el agente: se le pide no cambiar nada, pero hay que vigilarlo |
-| `webhook` | POST `{"mensaje": ...}` a una URL | Otro puente | Depende del puente |
-
-Prueba manual del modo `comando`, por SSH en el VPS:
 ```bash
-openclaw message send --channel whatsapp --target +51XXXXXXXXX --message "Prueba del sistema de apuestas"
+docker exec openclaw-wr93-openclaw-1 openclaw message send --channel whatsapp --target +51XXXXXXXXX --message "texto"
 ```
 
-Para el modo `webhook_openclaw`, en la config de OpenClaw:
-```json5
-hooks: {
-  enabled: true,
-  token: "<token-largo-y-aleatorio>",
-  path: "/hooks",
-  allowedAgentIds: ["main"],
-}
+- El texto llega **exacto**: no pasa por Gemini. Eso importa porque los registros del VPS muestran
+  fallos frecuentes de Gemini (503, 429 y 404); el envío directo no depende del modelo.
+- Si WhatsApp está reconectando (pasa cada ~2 h con el watchdog), el mensaje queda en la bandeja y
+  se reintenta a los 5 minutos, hasta 5 veces. Las alertas caducan al empezar el partido.
+
+**Primera prueba (por SSH en el VPS, como root):** antes de instalar nada, confirma que el
+comando existe y entrega:
+```bash
+docker exec openclaw-wr93-openclaw-1 openclaw message send --channel whatsapp --target +51TU_NUMERO --message "prueba"
 ```
+Si te llega, todo el camino de envío funciona. Si da error, mándame el mensaje.
+
+Instalación completa: [instalacion-paso-a-paso.md → D](instalacion-paso-a-paso.md#d-vps).
 
 ---
 
-## 6. football-data.co.uk
+## 5. football-data.co.uk
 
-No necesita cuenta. `apuestas verificar` descarga el archivo de la temporada actual de la primera
-liga activa para comprobar que hay salida a internet.
+No necesita cuenta. `apuestas verificar` descarga el archivo de la temporada actual para comprobar
+que hay salida a internet.
 
 ---
 
-## Prueba final del circuito
+## n8n (opcional)
 
-En n8n: **Apuestas 00 - Prueba de conexiones → Execute workflow**.
-Hace n8n → API (`/salud`) → API → Supabase (`/diagnostico`) → flujo 98 → WhatsApp.
-Si te llega el mensaje "PRUEBA DE CONEXIONES" con todo en OK, ya se pueden activar los flujos.
+No está instalado y **no hace falta**: los horarios los ponen los timers de systemd y el envío lo hace
+el mensajero. Instalar n8n solo para esto sumaría un servicio más (memoria, actualizaciones y una
+interfaz web que proteger) en un VPS de 1 vCPU sin firewall activo.
+
+Si más adelante lo quieres para otras automatizaciones, los flujos de `apuestas-sistema/n8n/` ya
+llaman a las mismas tareas (`POST /tareas/...`). Ver [ADR 0010](../02-decisiones/0010-programador-systemd-y-mensajero.md).

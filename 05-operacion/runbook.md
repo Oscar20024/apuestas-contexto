@@ -6,8 +6,11 @@
 docker compose exec apuestas-api python -m apuestas verificar     # en el VPS
 apuestas verificar                                                # en tu PC
 ```
-Revisa .env, Supabase, football-data y el uso de OddsPapi, y dice cómo arreglar cada error.
-Desde n8n, el flujo **00 - Prueba de conexiones** hace lo mismo y te manda el resultado por WhatsApp.
+Revisa .env, Supabase, la bandeja de mensajes, football-data y el uso de OddsPapi, y dice cómo
+arreglar cada error. `sudo systemctl start apuestas-tarea@prueba.service` hace lo mismo y te manda el
+resultado por WhatsApp.
+
+Registros del programador y el mensajero: `journalctl -u 'apuestas-*' -n 100 --no-pager`.
 
 ## …llega un mensaje "FALLO en Apuestas 0X"
 
@@ -18,17 +21,21 @@ Desde n8n, el flujo **00 - Prueba de conexiones** hace lo mismo y te manda el re
 | Error | Causa | Solución |
 |---|---|---|
 | `429 Limite mensual de OddsPapi` | Se gastaron las consultas del mes | Esperar al día 1 o subir de plan. Revisar `uso_api` por si algo se repitió de más. |
-| `401 Token invalido` | La credencial de n8n no coincide con `API_TOKEN` | Corregir la credencial "Apuestas API" en n8n |
+| `401 Token invalido` | `API_TOKEN` de `/etc/apuestas/host.env` distinto al del `.env` | Igualarlos y `docker compose up -d` |
+| `la API no responde` | El contenedor está caído | `docker compose ps` y `docker compose up -d` |
 | `could not connect to server` / timeout | Supabase pausado o URL mal | Abrir el proyecto en Supabase (lo despierta); revisar `DATABASE_URL` |
 | `Liga X sin modelo entrenado` | No corrió el entrenamiento | `docker compose exec apuestas-api python -m apuestas entrenar` |
 | `Historial insuficiente` | Liga nueva sin historial | `... python -m apuestas historial --ligas X` y luego entrenar |
 
 ## …no llegan mensajes a WhatsApp
 
-1. En n8n, abrir la última ejecución del flujo **98 - Enviar mensaje** y ver qué nodo falló.
-2. Modo `comando`: probar por SSH `openclaw message send --channel whatsapp --target +51... --message "prueba"`.
-   Si funciona por SSH pero no desde n8n: el nodo *Execute Command* está desactivado o n8n corre con otro usuario.
-3. Modo `webhook_openclaw`: revisar `hooks.enabled`, el token de la credencial `OpenClaw Hooks` y `openclaw logs --follow`.
+1. `journalctl -u apuestas-mensajero -n 50 --no-pager`: dice qué mensaje falló y por qué.
+2. Probar el envío directo: `python3 vps/apuestas_host.py probar-whatsapp`.
+3. Si falla también: `docker logs --tail 50 openclaw-wr93-openclaw-1` (¿WhatsApp desconectado?).
+   La sesión se reconecta sola cada ~2 h; los mensajes pendientes se reintentan cada 5 min, hasta 5 veces.
+4. En Supabase: `select id, tipo, estado, intentos, ultimo_error from mensajes_salida order by id desc limit 10;`
+   - `caducado`: era una alerta y el partido ya empezó (no sirve mandarla tarde).
+   - `fallido`: 5 intentos sin éxito. Para reenviarlo: `update mensajes_salida set estado='pendiente', intentos=0 where id=...;`
 
 ## …el resumen dice "nombres de equipos por revisar"
 
@@ -56,7 +63,7 @@ Antes de forzarlo, revisar: ¿el CLV de las alertas era positivo? Si era negativ
 
 ## …hice una apuesta real
 
-Registrarla para que el sistema calcule el fondo y el límite de pérdida:
+Registrarla para que el sistema calcule el fondo y el límite de pérdida (en el VPS, dentro de `/docker/apuestas-sistema`):
 
 ```bash
 docker compose exec apuestas-api python -m apuestas registrar-apuesta --evaluacion <ID de la alerta> --monto 10 --cuota 2.08

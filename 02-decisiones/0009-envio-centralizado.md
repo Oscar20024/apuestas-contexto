@@ -1,6 +1,6 @@
 # 0009 · Envío de mensajes centralizado en un flujo de n8n
 
-**Estado:** Aceptada · **Fecha:** 2026-11-22 · Aplica [0006](0006-mensajes-con-plantilla-fija.md)
+**Estado:** Reemplazada por [0010](0010-programador-systemd-y-mensajero.md) (n8n no está instalado en el VPS) · **Fecha:** 2026-11-22
 
 ## Contexto
 Varios flujos mandan mensajes (alertas, resumen, errores, prueba). Todavía no está decidido cómo

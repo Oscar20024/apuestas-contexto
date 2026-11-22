@@ -6,7 +6,7 @@
 Oscar quiere usar GitHub para control de versiones, contexto del proyecto y documentación, en dos carpetas independientes.
 
 ## Decisión
-- `apuestas-sistema`: solo lo que se despliega en el VPS (código, config, Docker, migraciones, flujos n8n, pruebas).
+- `apuestas-sistema`: solo lo que se despliega en el VPS (código, config, Docker, migraciones, scripts del VPS, pruebas).
 - `apuestas-contexto`: visión, arquitectura, decisiones, guías, bitácora y contexto para agentes de IA (`AGENTS.md`).
 
 Ambos privados.

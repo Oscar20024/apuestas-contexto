@@ -1,6 +1,7 @@
 # Calendario y presupuesto de consultas
 
-Hora de Lima (UTC−5). Los horarios están en los flujos de n8n (`apuestas-sistema/n8n/flujos/`).
+Hora de Lima (UTC−5). Los horarios están en los timers de systemd del VPS (`apuestas-sistema/vps/systemd/`).
+Ver próximas ejecuciones: `systemctl list-timers 'apuestas-*'`.
 
 | Día | Hora | Flujo | Horizonte | Consultas OddsPapi* |
 |---|---|---|---|---|

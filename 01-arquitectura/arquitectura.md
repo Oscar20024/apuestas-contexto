@@ -9,22 +9,25 @@ flowchart TB
         OP[OddsPapi<br/>Apuesta Total + Pinnacle]
     end
 
-    subgraph VPS Hostinger
-        N8N[n8n<br/>horarios y envío]
-        API[apuestas-api<br/>Docker · FastAPI · Python]
-        OC[OpenClaw + Gemini]
+    subgraph VPS["VPS Hostinger srv1864174 (1 vCPU, 3.8 GB)"]
+        T[systemd timers<br/>hora de Lima]
+        H[apuestas_host.py<br/>programador + mensajero]
+        API[apuestas-api<br/>Docker · FastAPI · 127.0.0.1:8010]
+        OC[OpenClaw<br/>openclaw-wr93-openclaw-1]
     end
 
-    SB[(Supabase<br/>Postgres)]
+    SB[(Supabase BDapuestas<br/>Postgres)]
     GH[GitHub<br/>apuestas-sistema · apuestas-contexto]
     WA[WhatsApp de Oscar]
     APP[App Android<br/>fase 4]
 
-    N8N -- HTTP + token --> API
+    T --> H
+    H -- "POST /tareas/* (token)" --> API
     API --> FD
     API --> OP
     API <--> SB
-    N8N -- mensajes --> OC --> WA
+    H -- "GET /mensajes/pendientes" --> API
+    H -- "docker exec ... message send" --> OC --> WA
     SB -.-> APP
     GH -. git pull .-> API
 ```
@@ -33,18 +36,16 @@ flowchart TB
 
 | Componente | Responsabilidad | Dónde |
 |---|---|---|
-| `apuestas-api` | Todo el cálculo: descarga, modelo, embudo, mensajes | Docker en el VPS, solo en `127.0.0.1:8010` |
-| n8n | Horarios (cron), llamar a la API, reenviar mensajes, avisar errores | VPS |
-| Supabase | Partidos, cuotas, modelos, evaluaciones, apuestas reales, uso de API | Nube (proyecto propio o esquema `apuestas` en uno existente) |
-| OpenClaw + Gemini | Entregar el mensaje por WhatsApp | VPS |
+| `apuestas-api` | Todo el cálculo: descarga, modelo, embudo, mensajes (los deja en la bandeja) | Docker en el VPS, solo en `127.0.0.1:8010`, UID 10001, 768 MB / 0.5 CPU |
+| Programador | A cada hora fija pide una tarea a la API | Timers de systemd en el VPS |
+| Mensajero | Entrega la bandeja por WhatsApp con `docker exec` a OpenClaw; reintenta | `vps/apuestas_host.py` en el VPS (root) |
+| Supabase | Partidos, cuotas, modelos, evaluaciones, bandeja de mensajes, apuestas reales, uso de API | Proyecto `BDapuestas` (us-west-2) |
+| OpenClaw | Sesión de WhatsApp; entrega el texto tal cual | Contenedor existente del VPS |
 | GitHub | Código versionado (`apuestas-sistema`) y contexto (`apuestas-contexto`) | Nube |
+| n8n (opcional) | Podría reemplazar a los timers; no está instalado | — |
 
-n8n no calcula nada: si mañana se cambia n8n por otra cosa, el sistema sigue igual.
-Ver [ADR 0004](../02-decisiones/0004-n8n-solo-orquesta.md).
-
-Todos los mensajes salen por un único flujo de n8n (**98 - Enviar mensaje**), que entrega a
-WhatsApp por comando de OpenClaw, por su webhook o por otro webhook.
-Ver [ADR 0009](../02-decisiones/0009-envio-centralizado.md).
+El orquestador no calcula: si mañana se cambian los timers por n8n u otra cosa, el sistema sigue igual.
+Ver [ADR 0004](../02-decisiones/0004-n8n-solo-orquesta.md) y [ADR 0010](../02-decisiones/0010-programador-systemd-y-mensajero.md).
 
 Puntos de conexión y cómo probarlos: [06-guias/conexiones.md](../06-guias/conexiones.md).
 
@@ -52,26 +53,31 @@ Puntos de conexión y cómo probarlos: [06-guias/conexiones.md](../06-guias/cone
 
 ```mermaid
 sequenceDiagram
-    participant N as n8n
+    participant T as systemd
+    participant H as apuestas_host.py
     participant A as apuestas-api
     participant S as Supabase
     participant O as OddsPapi
+    participant C as OpenClaw
     participant W as WhatsApp
 
-    Note over N: Lunes 7:00
-    N->>A: POST /historial/actualizar
-    A->>S: resultados + cuotas de cierre
-    N->>A: POST /modelo/entrenar
-    A->>S: modelo nuevo (activo)
-    N->>A: GET /resumen/semanal
-    N->>W: resumen
+    Note over T: Lunes 7:00
+    T->>H: tarea lunes
+    H->>A: POST /tareas/lunes
+    A->>S: resultados, modelo nuevo, resumen a la bandeja
 
-    Note over N: Mar-jue 9:00 · Vie 12:00 · Sáb-dom 6:00 y 10:00
-    N->>A: POST /escanear {horizonte_horas}
+    Note over T: Mar-jue 9:00 · Vie 12:00 · Sáb-dom 6:00 y 10:00
+    T->>H: tarea viernes (por ejemplo)
+    H->>A: POST /tareas/viernes
     A->>O: cuotas (2 consultas)
-    A->>S: partidos, cuotas, evaluaciones
-    A-->>N: alertas + mensajes
-    N->>W: una alerta por mensaje
+    A->>S: partidos, cuotas, evaluaciones, alertas a la bandeja
+    H->>A: GET /mensajes/pendientes
+    H->>C: docker exec openclaw message send
+    C->>W: alerta (texto exacto)
+    H->>A: POST /mensajes/{id}/resultado
+
+    Note over T: Cada 5 min
+    T->>H: enviar (reintentos de lo que quedó pendiente)
 ```
 
 ## Embudo de decisión (dentro de `apuestas-api`)
@@ -94,7 +100,9 @@ Detalle de cada paso: [04-modelo/modelo-y-embudo.md](../04-modelo/modelo-y-embud
 
 ## Seguridad
 
-- La API no se publica a internet: escucha en `127.0.0.1`. Solo n8n (en el mismo VPS) la llama.
+- La API no se publica a internet: escucha en `127.0.0.1` (el VPS tiene UFW desactivado, así que nada en `0.0.0.0`).
+- El mensajero es el único que toca WhatsApp, y solo ejecuta un comando fijo sin shell.
+- La API corre con UID 10001, distinto del 1000 que comparten OpenClaw y memory-api.
 - Todas las rutas (menos `/salud`) piden la cabecera `X-API-Token`.
 - RLS activado en todas las tablas de Supabase. El backend entra con el usuario `postgres`;
   la futura app usará políticas de solo lectura.
