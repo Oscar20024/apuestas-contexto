@@ -6,7 +6,7 @@ Detalle de cada conexión: [conexiones.md](conexiones.md).
 - [x] **A.** GitHub (`Oscar20024/apuestas-sistema` y `apuestas-contexto`, privados)
 - [ ] **A2.** Prueba y backtest en tu PC
 - [x] **B.** Supabase: `BDapuestas` conectado
-- [x] **C.** OddsPapi (key válida, IDs 17/8/23 verificados; 35 Bundesliga y 34 Ligue 1 activadas el 2026-11-22, confirmar con `verificar --con-oddspapi`)
+- [x] **C.** OddsPapi (key válida, IDs 17/8/23 verificados; 35 Bundesliga y 34 Ligue 1 activadas y verificadas el 2026-11-22)
 - [x] **D.** VPS: historial cargado, modelos entrenados, `verificar` 16 ok / 0 avisos, `instalar.sh` hecho (timers activos), `probar-whatsapp` OK
 - [x] **D2.** Estrategia v1.4.0 desplegada: precio justo Pinnacle + Betfair, 6 timers (incluye `previa` 12:30). Si se agregan timers, volver a correr `sudo bash vps/instalar.sh`
 - [~] **E.** Modo prueba — empieza el lunes 2026-11-23. Medir oportunidades (1–2 semanas) y CLV
