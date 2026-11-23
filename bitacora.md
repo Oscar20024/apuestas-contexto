@@ -23,7 +23,9 @@ Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 - `sudo bash vps/instalar.sh`: `/etc/apuestas/host.env` creado, permisos de `datos/`, unidades en `/etc/systemd/system`, 5 timers activos.
 - Horarios confirmados (systemd los muestra en UTC; Lima = UTC−5):
   lunes 12:00 UTC = 07:00 Lima · martes a jueves 14:00 UTC = 09:00 · viernes 17:00 UTC = 12:00 · sábado y domingo 11:00 UTC = 06:00 (y 10:00) · mensajero cada 5 min.
-- `probar-whatsapp`: mensaje enviado. Se lanzó `apuestas-tarea@prueba.service`.
+- `probar-whatsapp` y `apuestas-tarea@prueba.service`: **los dos mensajes llegaron al WhatsApp** (20:02 Lima).
+  Cadena completa probada: systemd → API → Supabase → bandeja → mensajero → OpenClaw → WhatsApp.
+  Datos cargados: E0 2760, SP1 2779, I1 2770 partidos, con modelo activo en las 3 ligas; 22 MB usados.
 
 Cómo se resolvió Supabase: la URL tenía la API key `sb_secret_...` en lugar de la contraseña de la base.
 Se reseteó la contraseña (Database → Settings) y, tras editar el `.env`, hubo que **recrear el contenedor**
