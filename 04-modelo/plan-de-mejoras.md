@@ -1,5 +1,11 @@
 # Plan de mejoras del modelo (investigación 2026-11-22)
 
+> **Estado (2026-11-22, noche):** fase 1 programada y medida. Pi-ratings, tiros a puerta y combinadores
+> **no mejoraron**; Pinnacle predice mejor que cualquier versión del modelo. Se cambió la estrategia
+> a "precio vs Pinnacle" ([ADR 0011](../02-decisiones/0011-probabilidad-desde-pinnacle.md)).
+> Resultados: `resultados-backtest-2026-11.md`. Las fases 2 y 3 quedan en pausa: con este resultado,
+> agregar xG o escenarios al modelo no cambia que el mercado sharp ya sabe más.
+
 Objetivo: que las alertas y los descartes sean más finos y se adapten a distintos escenarios,
 **sin** subir la complejidad a ciegas. Cada mejora entra solo si mejora el backtest
 (log-loss/RPS, calibración, ROI) y después el CLV real en modo prueba.

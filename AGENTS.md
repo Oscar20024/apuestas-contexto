@@ -44,7 +44,7 @@ Sistema personal de Oscar que busca apuestas de **ganador del partido (1X2)** co
 
 ## Cómo trabajar
 
-- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (59 pruebas).
+- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (66 pruebas).
 - Si algo de conexión falla: `apuestas verificar` antes de tocar código.
 - Después de un cambio importante: anotar en `bitacora.md` (fecha, qué, por qué).
 - Si una decisión cambia la arquitectura: crear un nuevo ADR en `02-decisiones/`.

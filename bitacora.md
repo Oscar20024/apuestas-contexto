@@ -2,6 +2,19 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-22 · v1.3.0 — backtest real y cambio de estrategia (ADR 0011)
+
+- CSV de football-data copiados del VPS a la PC (`tar` en el VPS + `scp mivps:...`; root no entra por llave).
+- Fase 1 programada: pi-ratings (`modelos/pi_ratings.py`), tiros a puerta en el normalizador,
+  combinador/stacking (`modelos/combinador.py`) y `apuestas comparar` (`backtest/comparar.py`).
+- **Resultado:** el sistema original perdía (ROI −5 % a −13 %, CLV −6 % en todas las temporadas) y ninguna
+  mejora lo arregla. Pinnacle sin margen predice mejor. Detalle en `04-modelo/resultados-backtest-2026-11.md`.
+- **Decisión de Oscar:** cambiar a "precio vs Pinnacle". `estrategia.yaml`: `fuente_probabilidad: mercado`,
+  margen `potencia`, selecciones H/D/A, EV mínimo 2 % (finde) y 3 % (entre semana), cuota 1,50–4,00,
+  diferencia máxima AT vs Pinnacle 10 pts. El modelo queda como dato informativo en la alerta.
+- Se esperan pocas alertas; el modo prueba medirá si Apuesta Total paga más que Pinnacle y con qué CLV.
+- 66 pruebas (antes 59).
+
 ## 2026-11-22 · Investigación: cómo mejorar el modelo
 
 - Nuevo `04-modelo/plan-de-mejoras.md`: 3 fases (sin datos nuevos → xG y bajas → descartes por escenario).

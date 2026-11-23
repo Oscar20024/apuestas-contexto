@@ -1,5 +1,11 @@
 # Modelo y embudo de decisión
 
+> **Cambio 2026-11-22 ([ADR 0011](../02-decisiones/0011-probabilidad-desde-pinnacle.md)):** la probabilidad que
+> decide las alertas sale de **Pinnacle sin margen** (`embudo.fuente_probabilidad: mercado`). Se alerta cuando
+> Apuesta Total paga más que ese precio justo. El modelo de abajo sigue entrenándose y aparece en la alerta como
+> dato informativo. Motivo: en el backtest perdía (ver `resultados-backtest-2026-11.md`).
+> Componentes nuevos disponibles para pruebas: pi-ratings (goles y tiros a puerta) y combinador (stacking).
+
 ## 1. Cómo predice el modelo
 
 **Dixon-Coles** (60% del resultado final)

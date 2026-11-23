@@ -51,6 +51,23 @@ pytest
 apuestas backtest --liga E0
 ```
 
+### Comparar variantes del modelo (backtest)
+Los CSV de football-data están guardados en el VPS. Para traerlos a la PC:
+```bash
+# VPS
+cd /docker/apuestas-sistema
+tar czf /tmp/football_data.tgz -C datos football_data && chmod 644 /tmp/football_data.tgz
+```
+```powershell
+# PC (PowerShell): root no entra por llave; usar el alias
+scp mivps:/tmp/football_data.tgz C:\Users\lenovo\Downloads\apuestas-sistema\datos\
+```
+```bash
+# Comparar (en la PC o en el VPS con docker compose exec apuestas-api python -m apuestas ...)
+apuestas comparar --liga E0 --csv datos/football_data/E0_*.csv
+apuestas comparar --liga E0 --reusar        # rehace solo las comparaciones (rapido)
+```
+
 ---
 
 ## VPS

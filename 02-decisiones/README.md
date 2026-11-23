@@ -15,3 +15,4 @@ Si una decisión cambia, no se borra el archivo: se crea uno nuevo que la reempl
 | [0008](0008-esquema-configurable.md) | Esquema de base de datos configurable (`DB_SCHEMA`) | Aceptada |
 | [0009](0009-envio-centralizado.md) | Envío de mensajes centralizado en el flujo 98 de n8n | Reemplazada por 0010 |
 | [0010](0010-programador-systemd-y-mensajero.md) | Programador con systemd y mensajero con bandeja de salida | Aceptada |
+| [0011](0011-probabilidad-desde-pinnacle.md) | La probabilidad sale de Pinnacle sin margen; el modelo queda informativo | Aceptada |
