@@ -8,6 +8,7 @@ Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
   con la plantilla real, marcada `[SIMULACRO ...]` y `[MODO PRUEBA ...]`. Partido y números inventados.
 - Se guarda en `mensajes_salida` como tipo `prueba`, caduca en 6 h y **no** crea evaluaciones: no ensucia las estadísticas ni el CLV.
 - 59 pruebas (antes 58).
+- Probado en el VPS (21:41 Lima): `git pull`, rebuild y `apuestas-tarea@simulacro.service` → la alerta llegó al WhatsApp con el formato correcto.
 
 ## 2026-11-22 · Estado al cierre del día — todas las conexiones verificadas
 
