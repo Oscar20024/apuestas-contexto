@@ -2,6 +2,20 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-22 · Referencia extra: Betfair Exchange
+
+Prueba con `probar-oddspapi --torneo 17` (Premier), una casa por comando:
+
+| Casa | Partidos con 1X2 | Tiempo sin cambios | Margen aprox. | Veredicto |
+|---|---|---|---|---|
+| `betfair-ex` | 19 de 21 | 0–0,5 h | ~1 % | ✅ elegida |
+| `sbobet` | 11 de 21 | 5–37 h | ~10 % | ❌ cuotas viejas y caras |
+| `singbet` | 0 | — | — | ❌ sin cuotas en nuestro plan |
+
+`estrategia.yaml` → `oddspapi.casas_referencia_extra: [betfair-ex]`. Precio justo = promedio Pinnacle + Betfair
+sin margen; las dos deben ver la ventaja. Si Betfair no tiene el partido, decide solo Pinnacle.
+Costo: 3 consultas por escaneo (~183 al mes de 250).
+
 ## 2026-11-22 · v1.4.0 — refuerzos del descarte
 
 - **Cuotas recientes:** se lee `changedAt` de cada precio. Si Pinnacle no cambia hace >12 h → `referencia_vieja`.
@@ -19,6 +33,7 @@ Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
   Candidatas a referencia extra: `sbobet`, `singbet`, `betfair-ex`, `matchbook` (falta probar cuál trae 1X2 de E0/SP1/I1).
 - `probar-oddspapi --casa a,b,c` muestra varias casas y la antigüedad de cada cuota.
 - 69 pruebas (antes 66).
+- Desplegado en el VPS (22:41 Lima, commit `93c685d`): 6 timers activos; primera `previa` el lunes 2026-11-23 12:30.
 
 ## 2026-11-22 · v1.3.0 — backtest real y cambio de estrategia (ADR 0011)
 
