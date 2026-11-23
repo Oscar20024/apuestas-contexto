@@ -2,6 +2,11 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-22 · Investigación: cómo mejorar el modelo
+
+- Nuevo `04-modelo/plan-de-mejoras.md`: 3 fases (sin datos nuevos → xG y bajas → descartes por escenario).
+- Primer paso acordado en el plan: backtest base de E0, SP1, I1 antes de tocar el modelo.
+
 ## 2026-11-22 · Tarea `simulacro`: una alerta inventada por WhatsApp
 
 - Nueva tarea `simulacro` (`apuestas-tarea@simulacro.service` o `apuestas tarea simulacro`): encola UNA alerta
