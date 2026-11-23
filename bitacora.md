@@ -12,6 +12,9 @@ Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
   Evita el mismo problema si un timer coincide con un despliegue.
 - El script del host se lee directo del repo: basta `git pull` (no hace falta reconstruir la imagen para esto).
 - 71 pruebas.
+- 18:39 Lima: `previa` relanzada a mano con v1.4.1 → **OK** (`partidos_vistos: 0`, `avisos: []`,
+  `consultas_referencia_extra: 0`). Cero partidos porque en las 8 h siguientes no había partidos de liga.
+  Primera ejecución completa sin errores de la estrategia de mercado.
 
 ## 2026-11-23 · v1.4.1 — falla de la primera `previa` y corrección
 
