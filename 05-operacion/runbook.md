@@ -26,6 +26,7 @@ Registros del programador y el mensajero: `journalctl -u 'apuestas-*' -n 100 --n
 | `could not connect to server` / timeout | Supabase pausado o URL mal | Abrir el proyecto en Supabase (lo despierta); revisar `DATABASE_URL` |
 | `Liga X sin modelo entrenado` | No corrió el entrenamiento | `docker compose exec apuestas-api python -m apuestas entrenar` |
 | `Historial insuficiente` | Liga nueva sin historial | `... python -m apuestas historial --ligas X` y luego entrenar |
+| `git pull` en el VPS: `Your local changes ... would be overwritten by merge: vps/apuestas_host.py` | `instalar.sh` hace `chmod 750` al script y git lo ve como cambio de permisos (no de contenido) | `git diff vps/apuestas_host.py` debe mostrar solo `old mode 100644 / new mode 100755`. Entonces `git checkout -- vps/apuestas_host.py && git pull`. Desde 2026-11-23 el repo guarda el archivo como ejecutable y no se repite |
 | `ConnectionResetError: [Errno 104] Connection reset by peer` justo al lanzar una tarea | La API estaba arrancando (después de `docker compose up --force-recreate`) | Desde v1.4.2 la tarea espera hasta 1 min a `/salud`. Si pasa igual: esperar 30 s y relanzar |
 | `400 Bad Request` en `odds-by-tournaments` | Varias casas juntas (`a,b`), o `betfair-ex` con varias ligas (2026-11-23) | Dejar `casas_por_consulta: 1`. Desde v1.4.1 Betfair va de a 1 liga y su falla no corta el escaneo |
 

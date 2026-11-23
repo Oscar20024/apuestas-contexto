@@ -2,6 +2,16 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-23 · `git pull` bloqueado por permisos de `apuestas_host.py`
+
+- En el VPS, `git pull` de v1.4.2 abortó: `Your local changes to the following files would be overwritten by merge:
+  vps/apuestas_host.py`. Causa: `instalar.sh` hace `chmod 750` al script; git registra el bit de ejecución y lo ve
+  como cambio local. No había cambios de contenido. Antes no pasó porque ningún commit había tocado ese archivo.
+  El `docker compose up` que siguió reconstruyó la misma 1.4.1 (sin la espera de v1.4.2).
+- **Solución:** en la PC, guardar el archivo como ejecutable en git (`git update-index --chmod=+x`); en el VPS,
+  descartar solo el cambio de permisos (`git checkout -- vps/apuestas_host.py`) y volver a hacer `git pull`.
+  Con el modo 100755 en el repo, el `chmod 750` ya no genera diferencias.
+
 ## 2026-11-23 · v1.4.2 — la tarea espera a que la API arranque
 
 - v1.4.1 desplegada (imagen `apuestas-api:1.4.1`). Al lanzar `apuestas-tarea@previa` justo después de
