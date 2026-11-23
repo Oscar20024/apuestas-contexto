@@ -26,6 +26,9 @@ Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 - `probar-whatsapp` y `apuestas-tarea@prueba.service`: **los dos mensajes llegaron al WhatsApp** (20:02 Lima).
   Cadena completa probada: systemd → API → Supabase → bandeja → mensajero → OpenClaw → WhatsApp.
   Datos cargados: E0 2760, SP1 2779, I1 2770 partidos, con modelo activo en las 3 ligas; 22 MB usados.
+- `probar-oddspapi --torneo 17`: **Apuesta Total y Pinnacle devuelven cuotas 1X2** (21 partidos de Premier).
+  Margen aproximado: Apuesta Total ~6 %, Pinnacle ~3 %. Los nombres de equipos salen `None` en esa prueba
+  (normal: el escaneo los busca con `/participants`). Estas 2 consultas no quedaron en `uso_api` (comando sin base).
 
 Cómo se resolvió Supabase: la URL tenía la API key `sb_secret_...` en lugar de la contraseña de la base.
 Se reseteó la contraseña (Database → Settings) y, tras editar el `.env`, hubo que **recrear el contenedor**

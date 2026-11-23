@@ -97,8 +97,8 @@ apuestas probar-oddspapi --torneo 17 --casa pinnacle
 ```
 
 Revisar `datos/oddspapi_muestra.json` y confirmar:
-- [ ] El nombre de la casa en `bookmakerOdds` es `apuestatotal` y `pinnacle` (si no, cambiar `casa_blanda` / `casa_referencia` en `estrategia.yaml`).
-- [ ] Existe el mercado `101` con resultados `101`, `102`, `103`.
+- [x] (2026-11-22) El nombre de la casa en `bookmakerOdds` es `apuestatotal` y `pinnacle` (si no, cambiar `casa_blanda` / `casa_referencia` en `estrategia.yaml`).
+- [x] (2026-11-22) Existe el mercado `101` con resultados `101`, `102`, `103`.
 - [ ] `participant1` es el local.
 - [ ] Si los nombres de equipos no vienen en la respuesta, que el comando muestre `None` es normal: el escaneo los busca con `/participants`.
-- [ ] Apuesta Total tiene cuotas para las ligas activas.
+- [x] (2026-11-22) Apuesta Total tiene cuotas para la Premier (torneo 17: 21 partidos, 8 de 9 mostrados con cuotas). LaLiga y Serie A se confirman en el primer escaneo.
