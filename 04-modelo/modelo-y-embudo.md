@@ -19,12 +19,13 @@ aparece en la alerta como **dato informativo**.
 |---|---|---|
 | Cuotas de Apuesta Total (donde apuestas) | OddsPapi `apuestatotal` | En cada escaneo |
 | Cuotas de Pinnacle (referencia principal) | OddsPapi `pinnacle` | En cada escaneo |
-| Cuotas de Betfair Exchange (segunda referencia) | OddsPapi `betfair-ex` | En cada escaneo |
+| Cuotas de Betfair Exchange (segunda referencia) | OddsPapi `betfair-ex` | Solo en las ligas donde Pinnacle ya ve una alerta posible (1 liga por consulta) |
 | Hora del último cambio de cada cuota | Campo `changedAt` de OddsPapi | En cada escaneo |
 | Primera cuota vista de Pinnacle | Tabla `cuotas` (tipo `apertura`) | Desde el primer escaneo del partido |
 | Nuestro modelo (informativo) | Modelo activo de la liga en `modelos` | Se reentrena cada lunes |
 
-Cada casa es **1 consulta** a OddsPapi por escaneo (con nuestra clave, pedirlas juntas da error 400).
+Apuesta Total y Pinnacle: **1 consulta cada una** por escaneo para las 5 ligas (pedir varias casas juntas
+da error 400). Betfair: 1 consulta por liga, solo cuando hace falta confirmar; si falla, decide Pinnacle sola.
 
 ## 2. El embudo, paso a paso
 

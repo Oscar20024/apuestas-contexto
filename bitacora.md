@@ -2,6 +2,23 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-23 · v1.4.1 — falla de la primera `previa` y corrección
+
+**Qué pasó:** a las 12:30 la tarea `previa` falló y llegó el aviso por WhatsApp:
+`400 Bad Request` en `odds-by-tournaments?tournamentIds=17,8,23,35,34&bookmakers=betfair-ex`.
+Apuesta Total y Pinnacle con las 5 ligas sí funcionaron; **Betfair Exchange no acepta varias ligas en una
+consulta** (con 1 liga, `probar-oddspapi --torneo 17`, sí funcionó). Como la falla cortó el escaneo,
+no se evaluó ningún partido. Gastó 3 consultas.
+
+**Corrección (v1.4.1):**
+- Betfair se pide **solo para las ligas donde Pinnacle ya ve una alerta posible**, de a **1 liga por consulta**.
+  Casi nunca hay alerta posible, así que casi nunca se gasta una consulta en Betfair.
+- Si Betfair (o cualquier referencia extra) falla, el escaneo **sigue** con Pinnacle sola y lo anota en
+  `resumen.avisos`.
+- El cliente se niega a pedir `betfair-ex` con más de 1 liga (no gasta la consulta en un 400 seguro).
+- Presupuesto: ~122 consultas/mes (Apuesta Total + Pinnacle) + unas pocas de Betfair.
+- Nueva prueba de punta a punta en modo mercado con Betfair (70 pruebas).
+
 ## 2026-11-22 · Bundesliga y Ligue 1 activadas
 
 - `config/ligas.yaml`: D1 (OddsPapi 35) y F1 (OddsPapi 34) con `activa: true`. Los IDs son los de Sportradar,

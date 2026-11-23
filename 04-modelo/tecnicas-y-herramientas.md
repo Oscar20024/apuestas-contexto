@@ -14,6 +14,7 @@ Leyenda: ✅ en uso · 🧪 programado, disponible para pruebas, no decide alert
 | **Precio justo desde el mercado sharp** | ✅ | La probabilidad "real" de cada resultado es la que implican Pinnacle y Betfair Exchange, sin su margen | `decision/embudo.py` (paso 2) | `embudo.fuente_probabilidad: mercado` |
 | **Quitar el margen: método potencia** | ✅ | Convierte cuotas en probabilidades que suman 100 %. El método potencia corrige un poco el sesgo favorito-sorpresa; en el backtest salió algo mejor que el proporcional en las 3 ligas | `decision/margen.py` | `embudo.metodo_margen: potencia` |
 | **Consenso de referencias** | ✅ | Precio justo = promedio de Pinnacle y Betfair. Si las dos tienen el partido, **las dos** deben ver la ventaja mínima | `decision/embudo.py` (paso 4) | `exigir_consenso_referencias: true`, `oddspapi.casas_referencia_extra: [betfair-ex]` |
+| **Referencia extra bajo demanda** | ✅ | Betfair solo se pide para las ligas donde Pinnacle ya ve una alerta posible; si falla, sigue Pinnacle sola | `servicios/escanear.py` (`_torneos_con_alerta_posible`) | v1.4.1 |
 | **Valor esperado (EV)** | ✅ | `EV = p_justa × cuota_Apuesta_Total − 1`. Se elige la selección con mayor EV entre local, empate y visita | `decision/margen.py`, `embudo.py` (paso 3) | 2 % sáb/dom, 3 % lun–vie |
 | **Rango de cuota** | ✅ | Evita favoritos muy cortos y sorpresas muy largas (donde el precio justo es menos preciso) | paso 4 | 1,50 – 4,00 |
 | **Diferencia sospechosa** | ✅ | Si Apuesta Total y la referencia difieren más de 10 puntos, suele ser cuota vieja, mercado equivocado o equipos cruzados | paso 4 | `diferencia_maxima_vs_pinnacle: 0.10` |
@@ -57,9 +58,9 @@ Leyenda: ✅ en uso · 🧪 programado, disponible para pruebas, no decide alert
 | Herramienta | Estado | Para qué | Límite / detalle |
 |---|---|---|---|
 | **football-data.co.uk** | ✅ | Historial: resultados, tiros, cuotas previas y de cierre (Bet365, Pinnacle, promedio) | Sin límite práctico. Pinnacle previa dejó de venir a mitad de 2025/26 |
-| **OddsPapi v4** (`odds-by-tournaments`) | ✅ | Cuotas en vivo de Apuesta Total, Pinnacle y Betfair Exchange | 250 consultas/mes gratis (reserva 20). **1 casa por consulta** (la lista dio 400). Precio con `changedAt` |
+| **OddsPapi v4** (`odds-by-tournaments`) | ✅ | Cuotas en vivo de Apuesta Total, Pinnacle y Betfair Exchange | 250 consultas/mes gratis (reserva 20). **1 casa por consulta** (la lista dio 400); hasta 5 ligas por consulta salvo `betfair-ex` (1). Precio con `changedAt` |
 | **OddsPapi `/bookmakers`, `/participants`, `/tournaments`** | ✅ | Lista de casas, nombres de equipos (caché 30 días), IDs de ligas | 1 consulta cada uno |
-| **Betfair Exchange** (`betfair-ex`) | ✅ | Segunda referencia del precio justo | 19/21 partidos de Premier, cuotas de < 1 h, margen ~1 % |
+| **Betfair Exchange** (`betfair-ex`) | ✅ | Segunda referencia del precio justo | 19/21 partidos de Premier, cuotas de < 1 h, margen ~1 %. **1 liga por consulta**; se pide solo si Pinnacle ve alerta posible (v1.4.1) |
 | **Pinnacle** (`pinnacle`) | ✅ | Referencia principal del precio justo y del CLV | — |
 | **Apuesta Total** (`apuestatotal`) | ✅ | Donde apuestas; la casa "blanda" que se compara | Margen ~6 % |
 | **Supabase (Postgres 17)** | ✅ | Partidos, cuotas, modelos, evaluaciones, bandeja, apuestas, uso de API | Plan gratis 500 MB (usa ~22 MB) |

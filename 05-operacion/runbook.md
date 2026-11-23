@@ -26,7 +26,7 @@ Registros del programador y el mensajero: `journalctl -u 'apuestas-*' -n 100 --n
 | `could not connect to server` / timeout | Supabase pausado o URL mal | Abrir el proyecto en Supabase (lo despierta); revisar `DATABASE_URL` |
 | `Liga X sin modelo entrenado` | No corrió el entrenamiento | `docker compose exec apuestas-api python -m apuestas entrenar` |
 | `Historial insuficiente` | Liga nueva sin historial | `... python -m apuestas historial --ligas X` y luego entrenar |
-| `400 Bad Request` en `odds-by-tournaments` | Se pidieron varias casas juntas (`a,b`) o un parámetro inválido | Dejar `oddspapi.casas_por_consulta: 1`. El escaneo ya pide de a una si la lista da 400 |
+| `400 Bad Request` en `odds-by-tournaments` | Varias casas juntas (`a,b`), o `betfair-ex` con varias ligas (2026-11-23) | Dejar `casas_por_consulta: 1`. Desde v1.4.1 Betfair va de a 1 liga y su falla no corta el escaneo |
 
 ## …no llegan mensajes a WhatsApp
 
@@ -65,6 +65,8 @@ select motivo, count(*) from evaluaciones where evaluado_en > now() - interval '
 - **`sin_consenso` en muchos partidos con ventaja:** Betfair ve distinto que Pinnacle. Es una protección;
   si quieres más alertas a cambio de más riesgo: `exigir_consenso_referencias: false` (decide el promedio).
 - **Betfair no trae un partido:** decide Pinnacle sola (no es error).
+- **Betfair falla (400, caída):** el escaneo sigue con Pinnacle y queda en `resumen.avisos` del resultado de la
+  tarea (`journalctl -u 'apuestas-tarea@*' -n 50`). Betfair acepta **1 liga por consulta**: nunca pedirla con varias.
 
 ## …quiero cambiar o quitar la casa de referencia extra
 

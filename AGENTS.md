@@ -6,7 +6,7 @@ Sistema personal de Oscar que busca apuestas de **ganador del partido (1X2)** co
 **Apuesta Total** (Perú). El precio justo de cada resultado sale de **Pinnacle y Betfair Exchange sin
 margen**; si Apuesta Total paga más que ese precio, el sistema manda una alerta por WhatsApp.
 Un modelo propio (Dixon-Coles + Elo) se muestra solo como dato informativo (ADR 0011).
-**Oscar apuesta a mano**; el sistema nunca apuesta. Versión actual: **v1.4.0**.
+**Oscar apuesta a mano**; el sistema nunca apuesta. Versión actual: **v1.4.1**.
 
 - Código: repositorio `apuestas-sistema` (Python 3.12, FastAPI, Docker).
 - Datos: Supabase (Postgres).
@@ -31,7 +31,8 @@ Un modelo propio (Dixon-Coles + Elo) se muestra solo como dato informativo (ADR 
 6. **Límites de riesgo siempre activos:** tope por apuesta (2%), exposición semanal (10%),
    pausa automática al perder 15% del fondo en el mes.
 7. **Presupuesto de API:** OddsPapi gratis = 250 consultas/mes. El cliente bloquea al llegar a 230.
-   **1 casa por consulta** (la lista dio 400). Hoy: 3 casas × ~61 escaneos ≈ 183/mes. Los comandos de
+   **1 casa por consulta** (la lista dio 400); `betfair-ex` además **1 liga por consulta** y solo bajo demanda.
+   Hoy: ~122/mes + pocas de Betfair. Los comandos de
    prueba (`probar-oddspapi`, `listar-casas`) gastan consultas que `uso_api` no cuenta.
 8. **Secretos solo en `.env`** (nunca en GitHub): `DATABASE_URL`, `ODDSPAPI_API_KEY`, `API_TOKEN`. En el VPS, además, `/etc/apuestas/host.env` (600).
 9. **La API nunca envía mensajes ni recibe acceso a Docker.** Solo el mensajero del VPS toca WhatsApp.
@@ -55,7 +56,7 @@ Un modelo propio (Dixon-Coles + Elo) se muestra solo como dato informativo (ADR 
 
 ## Cómo trabajar
 
-- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (69 pruebas).
+- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (70 pruebas).
 - Si algo de conexión falla: `apuestas verificar` antes de tocar código.
 - Después de un cambio importante: anotar en `bitacora.md` (fecha, qué, por qué).
 - Si una decisión cambia la arquitectura: crear un nuevo ADR en `02-decisiones/`.

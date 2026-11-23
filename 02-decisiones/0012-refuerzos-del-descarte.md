@@ -15,14 +15,16 @@ escaneo a las 09:00, lejos de los partidos de la tarde.
 2. **Consenso (`sin_consenso`):** segunda referencia `betfair-ex`. Precio justo = promedio sin margen de
    Pinnacle y Betfair; si las dos tienen el partido, **las dos** deben ver la ventaja mínima. Si Betfair no
    lo tiene, decide Pinnacle sola.
+   **v1.4.1 (2026-11-23):** Betfair se pide solo para las ligas donde Pinnacle ya ve una alerta posible y
+   de a 1 liga por consulta (con 5 ligas juntas dio 400). Si Betfair falla, el escaneo sigue con Pinnacle.
 3. **Revisión `previa`:** escaneo de 8 h a las 12:30 (Lima) todos los días menos viernes (el viernes ya
    está el de las 12:00). Timer `apuestas-previa.timer`.
 4. **Una casa por consulta** a OddsPapi (la lista dio 400). Si se configura `casas_por_consulta > 1` y la API
    responde 400, el sistema pide de a una sin fallar.
 
 ## Consecuencias
-- ~61 escaneos/mes × 3 casas ≈ **183 consultas de 250** (reserva de 20). No alcanza para una cuarta casa
-  ni para más de 5 ligas sin quitar escaneos.
+- ~61 escaneos/mes × 2 casas ≈ **122 consultas de 250** + unas pocas de Betfair (solo cuando hay alerta
+  posible). Más de 5 ligas duplicaría las de Apuesta Total y Pinnacle.
 - Menos alertas falsas por datos viejos o por una sola casa equivocada; algunas alertas buenas también
   se pierden cuando Betfair no coincide.
 - Estos filtros no se pueden backtestear (no hay historial de `changedAt` ni de Betfair): se evalúan en vivo

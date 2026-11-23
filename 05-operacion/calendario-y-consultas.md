@@ -11,7 +11,8 @@ Ver próximas ejecuciones: `systemctl list-timers 'apuestas-*'`.
 | Sábado y domingo | 6:00 y 10:00 | Revisión antes de los partidos | 12 h | 2 + 2 |
 | **Todos menos viernes** | **12:30** | **Previa: revisión cerca de los partidos** (desde v1.4.0) | 8 h | 2 |
 
-\* Con hasta 5 ligas: **1 consulta por casa** (Apuesta Total y Pinnacle = 2; con una referencia extra = 3).
+\* Con hasta 5 ligas: **1 consulta por casa** (Apuesta Total y Pinnacle = 2). Betfair Exchange solo se pide
+cuando Pinnacle ya ve una alerta posible en una liga, 1 consulta por liga (v1.4.1).
 La documentación de OddsPapi dice que se pueden pedir hasta 3 casas juntas, pero con nuestra clave
 `apuestatotal,pinnacle` respondió **400** (2026-11-22). Por eso `oddspapi.casas_por_consulta: 1`.
 
@@ -19,8 +20,8 @@ La documentación de OddsPapi dice que se pueden pedir hasta 3 casas juntas, per
 
 | Configuración | Escaneos/mes | Consultas/mes | De 250 gratis |
 |---|---|---|---|
-| 1–5 ligas, Apuesta Total + Pinnacle | ~61 | ~122 | 49 % |
-| **1–5 ligas, + 1 referencia extra (actual: 5 ligas + Betfair)** | ~61 | ~183 | 73 % |
+| **1–5 ligas, Apuesta Total + Pinnacle + Betfair solo si hay alerta posible (actual)** | ~61 | ~122 + pocas | ~50 % |
+| 1–5 ligas, con una referencia extra pedida siempre | ~61 | ~183 | 73 % |
 | 6–10 ligas, Apuesta Total + Pinnacle | ~61 | ~244 | **no alcanza** |
 
 Extras: 1 consulta al mes para la lista de equipos (participantes) y las que uses en pruebas.
