@@ -9,10 +9,14 @@ Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 - **Precio justo más sólido:** `oddspapi.casas_referencia_extra` (vacío por ahora). Con otra casa sharp,
   el precio justo es el promedio y todas deben ver la ventaja (`sin_consenso`). Falta elegir la casa con
   `apuestas listar-casas` (1 consulta).
-- **Revisión cerca del partido:** tarea `previa` todos los días 12:30 (8 h). Nuevo timer `apuestas-previa.timer`
-  → hay que volver a correr `sudo bash vps/instalar.sh`.
-- **Menos consultas:** OddsPapi acepta hasta 3 casas por consulta; Apuesta Total + Pinnacle ahora gastan 1 (antes 2).
-  Con la previa: ~65 consultas/mes de 250.
+- **Revisión cerca del partido:** tarea `previa` a las 12:30 todos los días menos viernes (8 h). Nuevo timer
+  `apuestas-previa.timer` → hay que volver a correr `sudo bash vps/instalar.sh`.
+- **Varias casas por consulta: NO funciona con nuestra clave.** La documentación dice hasta 3, pero
+  `probar-oddspapi --casa apuestatotal,pinnacle` dio **400 Bad Request**. Corregido (v1.4.0 final):
+  `oddspapi.casas_por_consulta: 1` y, si se sube y la API da 400, se piden de a una. ~122 consultas/mes de 250
+  (~183 con una referencia extra).
+- `listar-casas` funcionó: OddsPapi lista ~300 casas (guardado en `datos/oddspapi_casas.json` del VPS).
+  Candidatas a referencia extra: `sbobet`, `singbet`, `betfair-ex`, `matchbook` (falta probar cuál trae 1X2 de E0/SP1/I1).
 - `probar-oddspapi --casa a,b,c` muestra varias casas y la antigüedad de cada cuota.
 - 69 pruebas (antes 66).
 

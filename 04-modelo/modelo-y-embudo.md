@@ -11,7 +11,7 @@
 > - `sin_consenso`: con casas de referencia extra (`oddspapi.casas_referencia_extra`), el precio justo es el
 >   promedio sin margen y **todas** deben ver la ventaja mínima.
 > - La alerta dice qué casas la confirman y hace cuánto no cambia la cuota de Apuesta Total.
-> - Nueva revisión diaria a las 12:30 (`previa`, 8 h) para cuotas que Apuesta Total no actualizó.
+> - Nueva revisión a las 12:30, todos los días menos viernes (`previa`, 8 h), para cuotas que Apuesta Total no actualizó.
 
 ## 1. Cómo predice el modelo
 

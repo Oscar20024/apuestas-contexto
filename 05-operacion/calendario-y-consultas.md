@@ -6,25 +6,26 @@ Ver próximas ejecuciones: `systemctl list-timers 'apuestas-*'`.
 | Día | Hora | Tarea | Horizonte | Consultas OddsPapi* |
 |---|---|---|---|---|
 | Lunes | 7:00 | Historial + entrenar + resumen semanal | — | 0 |
-| Mar, mié, jue | 9:00 | Escaneo entre semana | 48 h | 1 |
-| Viernes | 12:00 | Escaneo del fin de semana | 72 h | 1 |
-| Sábado y domingo | 6:00 y 10:00 | Revisión antes de los partidos | 12 h | 1 + 1 |
-| **Todos los días** | **12:30** | **Previa: revisión cerca de los partidos** (desde v1.4.0) | 8 h | 1 |
+| Mar, mié, jue | 9:00 | Escaneo entre semana | 48 h | 2 |
+| Viernes | 12:00 | Escaneo del fin de semana | 72 h | 2 |
+| Sábado y domingo | 6:00 y 10:00 | Revisión antes de los partidos | 12 h | 2 + 2 |
+| **Todos menos viernes** | **12:30** | **Previa: revisión cerca de los partidos** (desde v1.4.0) | 8 h | 2 |
 
-\* Con hasta 5 ligas y hasta 3 casas (Apuesta Total + Pinnacle + 1 referencia extra): **1 consulta por escaneo**.
-Desde v1.4.0 las casas van juntas en una consulta (antes era 1 por casa). `betfair-ex` siempre va sola: +1.
+\* Con hasta 5 ligas: **1 consulta por casa** (Apuesta Total y Pinnacle = 2; con una referencia extra = 3).
+La documentación de OddsPapi dice que se pueden pedir hasta 3 casas juntas, pero con nuestra clave
+`apuestatotal,pinnacle` respondió **400** (2026-11-22). Por eso `oddspapi.casas_por_consulta: 1`.
 
 ## Presupuesto mensual (v1.4.0)
 
 | Configuración | Escaneos/mes | Consultas/mes | De 250 gratis |
 |---|---|---|---|
-| 1–5 ligas, AT + Pinnacle (+1 extra) | ~65 | ~65 | 26 % |
-| 1–5 ligas, + betfair-ex | ~65 | ~130 | 52 % |
-| 6–10 ligas, AT + Pinnacle (+1 extra) | ~65 | ~130 | 52 % |
+| 1–5 ligas, Apuesta Total + Pinnacle | ~61 | ~122 | 49 % |
+| 1–5 ligas, + 1 referencia extra | ~61 | ~183 | 73 % |
+| 6–10 ligas, Apuesta Total + Pinnacle | ~61 | ~244 | **no alcanza** |
 
 Extras: 1 consulta al mes para la lista de equipos (participantes) y las que uses en pruebas.
-Si la API no aceptara varias casas juntas, el sistema las pide por separado (el doble de consultas;
-igual entra en el presupuesto). El sistema se bloquea solo al llegar a 230 (deja 20 de reserva).
+Si se sube `casas_por_consulta` y la API responde 400, el sistema pide las casas de a una
+(gasta 1 consulta extra por la rechazada). El sistema se bloquea solo al llegar a 230 (deja 20 de reserva).
 
 ## Partidos europeos en hora de Lima
 
@@ -37,7 +38,8 @@ La previa de las 12:30 cubre los partidos de la tarde de Lima. Si se agregan lig
 
 - **Viernes 12:00**: primera lista para el fin de semana.
 - **Sáb/dom 6:00 y 10:00**: confirmaciones.
-- **Todos los días 12:30**: cuotas de Apuesta Total que no se actualizaron cerca del partido.
+- **12:30, todos menos viernes**: cuotas de Apuesta Total que no se actualizaron cerca del partido.
+  (El viernes ya está el escaneo de las 12:00.)
 - **Mar–jue 9:00**: partidos entre semana (ventaja mínima 3 %).
 
 Una alerta no se repite para el mismo partido y selección.

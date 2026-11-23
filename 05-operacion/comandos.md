@@ -73,9 +73,10 @@ apuestas comparar --liga E0 --reusar        # rehace solo las comparaciones (rap
 ```bash
 # VPS. Cada comando gasta 1 consulta
 docker compose exec apuestas-api python -m apuestas listar-casas --buscar betfair
-docker compose exec apuestas-api python -m apuestas probar-oddspapi --torneo 17 --casa apuestatotal,pinnacle,<otra>
+docker compose exec apuestas-api python -m apuestas probar-oddspapi --torneo 17 --casa sbobet
 ```
-Si `<otra>` trae cuotas, agregarla en `config/estrategia.yaml` → `oddspapi.casas_referencia_extra` (repo → VPS).
+Una casa por comando: con nuestra clave, varias casas juntas (`a,b`) dan **400**.
+Si la casa trae cuotas, agregarla en `config/estrategia.yaml` → `oddspapi.casas_referencia_extra` (repo → VPS).
 
 ---
 
