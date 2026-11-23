@@ -11,6 +11,8 @@ Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 - **Solución:** en la PC, guardar el archivo como ejecutable en git (`git update-index --chmod=+x`); en el VPS,
   descartar solo el cambio de permisos (`git checkout -- vps/apuestas_host.py`) y volver a hacer `git pull`.
   Con el modo 100755 en el repo, el `chmod 750` ya no genera diferencias.
+- Resultado (18:44 Lima): `git diff` mostró solo `old mode 100644 / new mode 100755`; `git checkout` + `git pull`
+  (commit `d9d6437`, "mode change 100644 => 100755 vps/apuestas_host.py") y reconstrucción → **`apuestas-api:1.4.2`** en marcha.
 
 ## 2026-11-23 · v1.4.2 — la tarea espera a que la API arranque
 
