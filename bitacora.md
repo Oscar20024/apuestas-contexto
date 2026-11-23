@@ -2,7 +2,7 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
-## 2026-11-22 · Estado al cierre del día — falta verificar la conexión a la base de datos
+## 2026-11-22 · Estado al cierre del día — todas las conexiones verificadas
 
 | Pieza | Estado |
 |---|---|
@@ -12,12 +12,22 @@ Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 | OddsPapi | ✅ key válida; IDs verificados: 17 = Premier, 8 = LaLiga, 23 = Serie A |
 | football-data | ✅ descarga desde el VPS |
 | Envío por WhatsApp (OpenClaw) | ✅ `openclaw message send` entrega (tras agregar `+51` a `allowFrom`) |
-| **Supabase (`BDapuestas`)** | ❌ **pendiente**: `password authentication failed`. Tablas creadas; falta la contraseña correcta |
+| Supabase (`BDapuestas`) | ✅ conectado (Postgres 17.12, 12 tablas, migraciones 0001 y 0002). `verificar`: 13 ok, 0 errores |
 | Datos (`historial`, `entrenar`) | ⏳ después de Supabase |
 | Programador y mensajero (`vps/instalar.sh`) | ⏳ después de los datos |
 
-**Siguiente paso:** resetear la contraseña de la base en Supabase, ponerla en el `.env` del VPS
-(`nano .env`, solo la parte entre `:` y `@`), `docker compose up -d --force-recreate` y `verificar`.
+**Siguiente paso:** dejar correr el modo prueba. Primera tarea programada: lunes 2026-11-23 07:00 (Lima).
+
+### Instalación completada (2026-11-22, noche)
+- `historial` y `entrenar` hechos; `verificar`: **16 ok, 0 avisos, 0 errores**.
+- `sudo bash vps/instalar.sh`: `/etc/apuestas/host.env` creado, permisos de `datos/`, unidades en `/etc/systemd/system`, 5 timers activos.
+- Horarios confirmados (systemd los muestra en UTC; Lima = UTC−5):
+  lunes 12:00 UTC = 07:00 Lima · martes a jueves 14:00 UTC = 09:00 · viernes 17:00 UTC = 12:00 · sábado y domingo 11:00 UTC = 06:00 (y 10:00) · mensajero cada 5 min.
+- `probar-whatsapp`: mensaje enviado. Se lanzó `apuestas-tarea@prueba.service`.
+
+Cómo se resolvió Supabase: la URL tenía la API key `sb_secret_...` en lugar de la contraseña de la base.
+Se reseteó la contraseña (Database → Settings) y, tras editar el `.env`, hubo que **recrear el contenedor**
+(`docker compose up -d --force-recreate`): Docker solo lee el `.env` al crear el contenedor.
 
 Lecciones del día:
 - Las credenciales se habían escrito en `.env.example` (que se sube a GitHub). Se movieron a `.env` antes de cualquier commit.

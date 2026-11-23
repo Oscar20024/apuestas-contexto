@@ -5,10 +5,10 @@ Detalle de cada conexión: [conexiones.md](conexiones.md).
 
 - [x] **A.** GitHub (`Oscar20024/apuestas-sistema` y `apuestas-contexto`, privados)
 - [ ] **A2.** Prueba y backtest en tu PC
-- [~] **B.** Supabase: tablas creadas en `BDapuestas`; falta tu cadena de conexión
+- [x] **B.** Supabase: `BDapuestas` conectado
 - [x] **C.** OddsPapi (key válida, IDs 17/8/23 verificados)
-- [~] **D.** VPS: código clonado, API corriendo, OddsPapi y WhatsApp verificados. **Falta: contraseña de Supabase**, luego datos y `instalar.sh`
-- [ ] **E.** Modo prueba (4–8 semanas)
+- [x] **D.** VPS: historial cargado, modelos entrenados, `verificar` 16 ok / 0 avisos, `instalar.sh` hecho (timers activos), `probar-whatsapp` OK
+- [~] **E.** Modo prueba (4–8 semanas) — empieza el lunes 2026-11-23
 
 Todos los comandos en una sola hoja: [05-operacion/comandos.md](../05-operacion/comandos.md).
 

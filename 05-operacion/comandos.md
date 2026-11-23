@@ -145,6 +145,8 @@ No reiniciar OpenClaw sin necesidad: al arrancar puede reescribir `allowFrom` (v
 ## Supabase (panel web)
 
 - Cadena de conexión: `BDapuestas` → **Connect** → **Session pooler** (puerto 5432).
-- Cambiar la contraseña de la base: **Project Settings** → **Database** → **Reset database password** → **Generate a password**.
+- Cambiar la contraseña de la base: menú **Database** → **Settings** → **Reset database password** → **Generate a password**.
+  Ojo: no es ninguna de las API keys (`sb_publishable_...`, `sb_secret_...`).
+  Si tiene símbolos, en la URL van codificados: `?`→`%3F`, `#`→`%23`, `@`→`%40`, `:`→`%3A`, `/`→`%2F`, `%`→`%25`.
   Después: actualizar `DATABASE_URL` en el `.env` del VPS, y en `.env` y `.env.vps` de la PC.
 - Consultas útiles: ver `03-datos/modelo-de-datos.md`.

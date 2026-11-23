@@ -6,10 +6,10 @@ Estado al 2026-11-22. Por servicio: qué dato hace falta, dónde va y cómo comp
 
 | # | Conexión | Estado | Dato que falta | Dónde va | Cómo compruebo |
 |---|---|---|---|---|---|
-| 1 | API → Supabase | ❌ **Falla la contraseña** (`password authentication failed`). Tablas creadas | Cadena "Session pooler" con tu contraseña | `.env` → `DATABASE_URL` | `apuestas verificar` |
+| 1 | API → Supabase | ✅ Verificado desde el VPS | Cadena "Session pooler" con tu contraseña | `.env` → `DATABASE_URL` | `apuestas verificar` |
 | 2 | API → OddsPapi | ✅ Verificado desde el VPS | API key | `.env` → `ODDSPAPI_API_KEY` | `apuestas verificar --con-oddspapi` (gasta 1) |
-| 3 | Programador/mensajero → API | Listo en el código | Token (se genera solo) | `.env` y `/etc/apuestas/host.env` | `python3 vps/apuestas_host.py estado` |
-| 4 | Mensajero → OpenClaw → WhatsApp | ✅ Envío probado a mano | Tu número | `/etc/apuestas/host.env` (lo pide `instalar.sh`) | `python3 vps/apuestas_host.py probar-whatsapp` |
+| 3 | Programador/mensajero → API | ✅ Instalado (`instalar.sh`) | Token (se genera solo) | `.env` y `/etc/apuestas/host.env` | `python3 vps/apuestas_host.py estado` |
+| 4 | Mensajero → OpenClaw → WhatsApp | ✅ `probar-whatsapp` OK desde el host | Tu número | `/etc/apuestas/host.env` (lo pide `instalar.sh`) | `python3 vps/apuestas_host.py probar-whatsapp` |
 | 5 | API → football-data | ✅ Verificado desde el VPS | — | — | `apuestas verificar` |
 | — | n8n | **No hace falta** | — | — | Ver [n8n opcional](#n8n-opcional) |
 
