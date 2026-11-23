@@ -38,6 +38,8 @@ Sistema personal de Oscar que busca apuestas de **ganador del partido (1X2)** co
 | Cambiar umbrales | `apuestas-sistema/config/estrategia.yaml` (+ backtest + bitácora) |
 | Agregar una liga | `apuestas-sistema/config/ligas.yaml` + `05-operacion/runbook.md` |
 | Conectar un servicio | `06-guias/conexiones.md` |
+| Comandos (PC, VPS, OpenClaw, Supabase) | `05-operacion/comandos.md` |
+| Estado actual del despliegue | `bitacora.md` (entrada más reciente) |
 | Lo que falta decidir | `preguntas-abiertas.md` |
 
 ## Cómo trabajar

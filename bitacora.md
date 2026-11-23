@@ -2,6 +2,35 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-22 · Estado al cierre del día — falta verificar la conexión a la base de datos
+
+| Pieza | Estado |
+|---|---|
+| Repos en GitHub (`Oscar20024`) | ✅ v1.2.0 en ambos |
+| Código en el VPS (`/docker/apuestas-sistema`) | ✅ clonado con deploy key de solo lectura; `git pull` funciona |
+| API en Docker | ✅ `Up (healthy)` en `127.0.0.1:8010` |
+| OddsPapi | ✅ key válida; IDs verificados: 17 = Premier, 8 = LaLiga, 23 = Serie A |
+| football-data | ✅ descarga desde el VPS |
+| Envío por WhatsApp (OpenClaw) | ✅ `openclaw message send` entrega (tras agregar `+51` a `allowFrom`) |
+| **Supabase (`BDapuestas`)** | ❌ **pendiente**: `password authentication failed`. Tablas creadas; falta la contraseña correcta |
+| Datos (`historial`, `entrenar`) | ⏳ después de Supabase |
+| Programador y mensajero (`vps/instalar.sh`) | ⏳ después de los datos |
+
+**Siguiente paso:** resetear la contraseña de la base en Supabase, ponerla en el `.env` del VPS
+(`nano .env`, solo la parte entre `:` y `@`), `docker compose up -d --force-recreate` y `verificar`.
+
+Lecciones del día:
+- Las credenciales se habían escrito en `.env.example` (que se sube a GitHub). Se movieron a `.env` antes de cualquier commit.
+- En el VPS se pegaron comandos dentro de `.env`. El `.env` lleva solo 4 líneas `CLAVE=valor`; los comandos van en la terminal.
+- Comandos de referencia: `05-operacion/comandos.md`.
+
+## 2026-11-22 · Prueba de envío en el VPS real
+
+- `docker exec openclaw-wr93-openclaw-1 openclaw message send --channel whatsapp` falló primero:
+  `allowFrom` tenía el número sin `+51`. Se agregó en formato internacional sin quitar el existente.
+  Después: "Sent via gateway (whatsapp)". OpenClaw no se reinició (el envío funcionó sin reiniciar).
+- Credenciales movidas de `.env.example` a `.env` en la PC antes de cualquier commit (no se filtró nada).
+
 ## 2026-11-22 · v1.2.0 — adaptado al VPS real (sin n8n) y tablas creadas en Supabase
 
 **Por qué:** n8n no está instalado, y OpenClaw corre en Docker y se maneja con `docker exec`

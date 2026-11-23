@@ -37,6 +37,22 @@ Registros del programador y el mensajero: `journalctl -u 'apuestas-*' -n 100 --n
    - `caducado`: era una alerta y el partido ya empezó (no sirve mandarla tarde).
    - `fallido`: 5 intentos sin éxito. Para reenviarlo: `update mensajes_salida set estado='pendiente', intentos=0 where id=...;`
 
+## …OpenClaw responde "is not listed in the configured WhatsApp allowFrom policy"
+
+OpenClaw solo envía WhatsApp a números de `channels.whatsapp.allowFrom`, y los compara en formato
+internacional (E.164, con `+51`). Encontrado el 2026-11-22: la lista tenía el número sin código de país.
+
+```bash
+docker exec openclaw-wr93-openclaw-1 openclaw config get channels.whatsapp.allowFrom
+docker exec openclaw-wr93-openclaw-1 openclaw config set channels.whatsapp.allowFrom '["XXXXXXXXX", "+51XXXXXXXXX"]' --strict-json
+```
+Se **agrega** el número en formato `+51` y se mantiene el que ya estaba, para no cambiar cómo
+funciona hoy OpenClaw con sus otras funciones. El cambio se aplica en caliente.
+
+Ojo: el arranque de la imagen de Hostinger reescribe la config de WhatsApp en cada reinicio, probablemente
+a partir de `WHATSAPP_NUMBER` del `.env` de OpenClaw. Si después de un reinicio vuelve el error, revisar
+`docker exec openclaw-wr93-openclaw-1 printenv WHATSAPP_NUMBER` y repetir el `config set`.
+
 ## …el resumen dice "nombres de equipos por revisar"
 
 OddsPapi llamó a un equipo de una forma que el sistema no reconoció. Mientras no se resuelva,

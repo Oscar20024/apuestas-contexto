@@ -6,9 +6,11 @@ Detalle de cada conexión: [conexiones.md](conexiones.md).
 - [x] **A.** GitHub (`Oscar20024/apuestas-sistema` y `apuestas-contexto`, privados)
 - [ ] **A2.** Prueba y backtest en tu PC
 - [~] **B.** Supabase: tablas creadas en `BDapuestas`; falta tu cadena de conexión
-- [ ] **C.** OddsPapi
-- [ ] **D.** VPS: API en Docker + programador y mensajero
+- [x] **C.** OddsPapi (key válida, IDs 17/8/23 verificados)
+- [~] **D.** VPS: código clonado, API corriendo, OddsPapi y WhatsApp verificados. **Falta: contraseña de Supabase**, luego datos y `instalar.sh`
 - [ ] **E.** Modo prueba (4–8 semanas)
+
+Todos los comandos en una sola hoja: [05-operacion/comandos.md](../05-operacion/comandos.md).
 
 Herramientas que ayudan en todo el camino:
 - `apuestas configurar`: arma el `.env` pidiéndote cada dato y prueba la base de datos al momento.

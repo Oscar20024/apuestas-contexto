@@ -6,11 +6,11 @@ Lo que falta definir. Al resolver una, moverla a "Resueltas" con la fecha y la r
 
 | # | Pregunta | Por qué importa | Valor provisional |
 |---|---|---|---|
-| 1 | ¿`docker exec openclaw-wr93-openclaw-1 openclaw message send --channel whatsapp ...` entrega en tu VPS? | Es el camino de todos los mensajes | Se asume que sí |
-| 2 | ¿Número de WhatsApp que recibe las alertas? | Lo pide `vps/instalar.sh` | — |
-| 3 | ¿Qué ligas te interesan? ¿Incluir Liga 1 de Perú? | Liga 1 no está en football-data: hace falta otra fuente | Premier, LaLiga, Serie A |
-| 4 | ¿Con qué monto de fondo empezarías (soles) y cuál es la apuesta mínima en Apuesta Total? | Define los montos sugeridos | S/ 500 · mínimo S/ 2 |
-| 5 | ¿Registrar apuestas desde WhatsApp (responder "aposte 10 a 2.08")? | Sin registro, el límite de pérdida no funciona | Por comando en el VPS |
+| 0 | **Contraseña de la base de `BDapuestas`**: la actual falla. Resetearla y actualizar `.env` (VPS y PC) | Sin base no hay datos ni alertas | — |
+| 1 | ¿Número de WhatsApp que recibe las alertas? | Lo pide `vps/instalar.sh` (debe estar en `allowFrom` de OpenClaw con `+51`) | El tuyo |
+| 2 | ¿Qué ligas te interesan? ¿Incluir Liga 1 de Perú? | Liga 1 no está en football-data: hace falta otra fuente | Premier, LaLiga, Serie A |
+| 3 | ¿Con qué monto de fondo empezarías (soles) y cuál es la apuesta mínima en Apuesta Total? | Define los montos sugeridos | S/ 500 · mínimo S/ 2 |
+| 4 | ¿Registrar apuestas desde WhatsApp (responder "aposte 10 a 2.08")? | Sin registro, el límite de pérdida no funciona | Por comando en el VPS |
 
 ## Resueltas
 
@@ -23,3 +23,4 @@ Lo que falta definir. Al resolver una, moverla a "Resueltas" con la fecha y la r
 | 2026-11-22 | ¿Qué proyecto de Supabase? | Proyecto nuevo `BDapuestas` en otra cuenta, esquema `public`. Tablas creadas |
 | 2026-11-22 | ¿n8n? | No está instalado. Horarios con systemd y envío con el mensajero (ADR 0010). n8n queda opcional |
 | 2026-11-22 | ¿Cómo es el VPS? | `srv1864174`: 1 vCPU, 3.8 GB RAM + 2 GB swap, Docker; OpenClaw, memory-api, riachuelo y Traefik ya corren ahí |
+| 2026-11-22 | ¿El envío por `docker exec ... openclaw message send` funciona? | Sí, después de agregar el número con `+51` a `channels.whatsapp.allowFrom` (se mantuvo el que ya estaba). Ver runbook |
