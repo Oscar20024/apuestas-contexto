@@ -2,6 +2,23 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-22 · Documentación al día con v1.4.0
+
+Revisión completa del repo de contexto contra lo que corre en el VPS:
+- Nuevo `04-modelo/tecnicas-y-herramientas.md`: catálogo de cada técnica y herramienta (en uso, probada,
+  investigada o descartada), con dónde está en el código, parámetros y resultado.
+- `04-modelo/modelo-y-embudo.md` reescrito: embudo actual (10 motivos), ejemplo con cuotas reales del 27-11,
+  formato de la alerta y limitaciones del backtest.
+- Nuevo ADR 0012 (refuerzos del descarte). ADR 0003, 0005 y 0007 marcados/actualizados.
+- `vision.md`, `arquitectura.md` (diagramas), `modelo-de-datos.md` (motivos, columnas, `detalles`, consulta de
+  oportunidades), `runbook.md` (400, `sin_consenso`, `referencia_vieja`, cambiar referencia, volver al modelo),
+  `conexiones.md`, `instalacion-paso-a-paso.md`, `preguntas-abiertas.md`, `plan-de-mejoras.md`, `AGENTS.md`, `README.md`.
+
+Cambios de código menores (mismo despliegue):
+- `evaluaciones.p_local/p_empate/p_visita` ahora guardan la probabilidad que **decidió** (precio justo en modo
+  mercado); nuestro modelo queda en `detalles`. `detalles.p_justa` nuevo.
+- La alerta dice "Prob. justa (Pinnacle + Betfair Exchange)" en vez de una línea aparte de confirmación.
+
 ## 2026-11-22 · Referencia extra: Betfair Exchange
 
 Prueba con `probar-oddspapi --torneo 17` (Premier), una casa por comando:

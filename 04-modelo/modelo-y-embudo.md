@@ -1,73 +1,131 @@
 # Modelo y embudo de decisión
 
-> **Cambio 2026-11-22 ([ADR 0011](../02-decisiones/0011-probabilidad-desde-pinnacle.md)):** la probabilidad que
-> decide las alertas sale de **Pinnacle sin margen** (`embudo.fuente_probabilidad: mercado`). Se alerta cuando
-> Apuesta Total paga más que ese precio justo. El modelo de abajo sigue entrenándose y aparece en la alerta como
-> dato informativo. Motivo: en el backtest perdía (ver `resultados-backtest-2026-11.md`).
-> Componentes nuevos disponibles para pruebas: pi-ratings (goles y tiros a puerta) y combinador (stacking).
->
-> **Refuerzos v1.4.0 (filtros extra en el paso 4):**
-> - `referencia_vieja`: si la cuota de Pinnacle no cambia hace más de 12 h, no se confía en ella.
-> - `sin_consenso`: con casas de referencia extra (`oddspapi.casas_referencia_extra`), el precio justo es el
->   promedio sin margen y **todas** deben ver la ventaja mínima.
-> - La alerta dice qué casas la confirman y hace cuánto no cambia la cuota de Apuesta Total.
-> - Nueva revisión a las 12:30, todos los días menos viernes (`previa`, 8 h), para cuotas que Apuesta Total no actualizó.
+Estado: **v1.4.0 (2026-11-22)**. Catálogo de cada técnica y herramienta: [tecnicas-y-herramientas.md](tecnicas-y-herramientas.md).
 
-## 1. Cómo predice el modelo
+## 0. La idea en una frase
 
-**Dixon-Coles** (60% del resultado final)
-- Cada equipo tiene "ataque" y "defensa". Goles esperados del local = ventaja de local × ataque local × debilidad defensiva del visitante (y al revés para el visitante).
-- Con los goles esperados se arma la tabla de marcadores posibles (0-0, 1-0, 2-1…) y se suman las casillas de "gana local", "empate" y "gana visita".
-- Corrige que 0-0, 1-0, 0-1 y 1-1 pasan un poco distinto de lo que dice la fórmula.
-- Usa 3 años de partidos; uno de hace 1 año pesa la mitad que uno de esta semana.
+Pinnacle y Betfair Exchange son los mercados que mejor predicen el fútbol. Si **Apuesta Total paga más
+que el precio justo que dan esos dos mercados**, hay valor. El sistema busca esos casos y te avisa.
 
-**Elo + regresión logística** (40%)
-- Todos empiezan en 1500; el que gana sube y el que pierde baja (más si fue sorpresa o goleada).
-- Al empezar una temporada, cada equipo regresa 1/3 hacia 1500 (fichajes, cambios).
-- Una regresión logística aprende cómo una diferencia de Elo se traduce en P(local), P(empate), P(visita).
+Hasta el 2026-11-22 la probabilidad salía de un modelo propio (Dixon-Coles + Elo). El backtest con
+partidos reales mostró que perdía (ROI −5 % a −13 %, CLV −6 % en todas las temporadas), y ninguna
+mejora lo arregló. Ver [resultados-backtest-2026-11.md](resultados-backtest-2026-11.md) y
+[ADR 0011](../02-decisiones/0011-probabilidad-desde-pinnacle.md). El modelo sigue entrenándose y
+aparece en la alerta como **dato informativo**.
 
-**Lo que el modelo NO sabe:** lesiones, rotaciones, clima, motivación, cambio de técnico.
-Por eso el paso 4 mira si Pinnacle (que sí lo sabe) se movió en contra.
+## 1. De dónde sale cada número
+
+| Dato | Fuente | Cuándo |
+|---|---|---|
+| Cuotas de Apuesta Total (donde apuestas) | OddsPapi `apuestatotal` | En cada escaneo |
+| Cuotas de Pinnacle (referencia principal) | OddsPapi `pinnacle` | En cada escaneo |
+| Cuotas de Betfair Exchange (segunda referencia) | OddsPapi `betfair-ex` | En cada escaneo |
+| Hora del último cambio de cada cuota | Campo `changedAt` de OddsPapi | En cada escaneo |
+| Primera cuota vista de Pinnacle | Tabla `cuotas` (tipo `apertura`) | Desde el primer escaneo del partido |
+| Nuestro modelo (informativo) | Modelo activo de la liga en `modelos` | Se reentrena cada lunes |
+
+Cada casa es **1 consulta** a OddsPapi por escaneo (con nuestra clave, pedirlas juntas da error 400).
 
 ## 2. El embudo, paso a paso
 
-Configuración: `apuestas-sistema/config/estrategia.yaml` (sección `embudo`).
+Configuración: `apuestas-sistema/config/estrategia.yaml` (sección `embudo` y `oddspapi`).
+Código: `apuestas-sistema/src/apuestas/decision/embudo.py` (función pura: igual en backtest y en vivo).
 
-| Paso | Pregunta | Si falla | Valor por defecto |
+| Paso | Pregunta | Si falla (motivo guardado) | Valor actual |
 |---|---|---|---|
-| 1. Calidad de datos | ¿Ambos equipos tienen suficientes partidos en el modelo? | `pocos_datos` | ≥ 10 partidos |
-| 2. Probabilidad | ¿El modelo conoce a ambos equipos? | `sin_prediccion` | — |
-| 3. Valor | ¿`p_modelo × cuota − 1` supera el mínimo? | `sin_valor` | 5% sáb/dom · 8% lun–vie |
-| 4a. Rango | ¿La cuota está en el rango? | `cuota_fuera_rango` | 1.50 – 3.50 |
-| 4b. Sospecha | ¿El modelo difiere del mercado más de lo creíble? | `ventaja_sospechosa` | > 15 puntos |
-| 4c. Mercado | ¿Pinnacle bajó la probabilidad de nuestra selección desde que la vimos? | `mercado_en_contra` | > 3 puntos |
-| 5. Monto | Kelly × 25%, con tope | — | tope 2% del fondo |
+| 1. Calidad de datos | Solo con `fuente_probabilidad: modelo`: ¿ambos equipos tienen partidos suficientes? | `pocos_datos` | ≥ 10 partidos |
+| 2. Probabilidad | ¿Hay cuotas válidas de Pinnacle? Precio justo = promedio sin margen de Pinnacle y Betfair (si Betfair tiene el partido) | `sin_referencia` | método `potencia` |
+| 3a. Cuotas | ¿Hay cuotas válidas de Apuesta Total? | `sin_cuotas` | — |
+| 3b. Valor | De local, empate y visita, ¿la de mayor `EV = p_justa × cuota − 1` llega al mínimo? | `sin_valor` | 2 % sáb/dom · 3 % lun–vie |
+| 4a. Rango | ¿La cuota está en el rango? | `cuota_fuera_rango` | 1,50 – 4,00 |
+| 4b. Sospecha | ¿Apuesta Total y el precio justo difieren más de lo creíble? (cuota vieja, error de datos) | `ventaja_sospechosa` | > 10 puntos |
+| 4c. Frescura | ¿La cuota de Pinnacle lleva demasiado sin cambiar? | `referencia_vieja` | > 12 h |
+| 4d. Consenso | Con Pinnacle y Betfair: ¿**las dos** ven la ventaja mínima? | `sin_consenso` | sí, ambas |
+| 4e. Mercado | ¿Pinnacle bajó la probabilidad de la selección desde la primera vez que se vio? | `mercado_en_contra` | > 3 puntos |
+| 5. Monto | Kelly × 25 %, con tope y mínimo de la casa | — | tope 2 % · mínimo S/ 2 |
 
-Después, límites globales: máximo 3 alertas por día, máximo 10% del fondo expuesto por semana
-y pausa total si en el mes se perdió 15% del fondo.
+Después, **límites globales** (`servicios/escanear.py`): máximo 3 alertas por día (primero las de mayor
+ventaja), máximo 10 % del fondo expuesto por semana, pausa total si en el mes se perdió 15 % del fondo.
+Una alerta no se repite para el mismo partido y selección, y caduca cuando empieza el partido.
 
-### Ejemplo
+Todas las evaluaciones (alertas y descartes) se guardan en `evaluaciones` con su motivo y los detalles:
+probabilidades de cada referencia, EV por referencia, antigüedad de las cuotas y lo que decía nuestro modelo.
 
-Arsenal (local) vs Chelsea, sábado. Apuesta Total paga 2.10 / 3.40 / 3.60.
-- Margen de la casa: 1/2.10 + 1/3.40 + 1/3.60 = 1.048 → 4.8%. Sin margen, el mercado da 45.4% al local.
-- El modelo da 52%. EV = 0.52 × 2.10 − 1 = **+9.2%** → pasa el paso 3 (mínimo 5%).
-- Cuota 2.10 está entre 1.50 y 3.50; diferencia con Pinnacle ≈ 6 puntos (< 15); Pinnacle no se movió en contra → pasa el paso 4.
-- Kelly: (0.52 × 2.10 − 1) / 1.10 = 8.4% → × 25% = 2.1% → tope 2% → con fondo de S/ 500 = **S/ 10**.
-- La alerta dice además "solo si la cuota sigue en 2.02 o más" (por debajo, el EV cae del 5%).
+## 3. Ejemplo con números reales
 
-## 3. Cómo leer un backtest
+Partido de la Premier del 27-11-2026 (cuotas leídas de OddsPapi el 22-11):
 
-```bash
-apuestas backtest --liga E0
+| | Local | Empate | Visita | Margen |
+|---|---|---|---|---|
+| Apuesta Total | 2,75 | 3,50 | 2,43 | 6,1 % |
+| Pinnacle | 2,84 | 3,41 | 2,60 | 3,0 % |
+| Betfair Exchange | 2,84 | 3,55 | 2,70 | ~1 % |
+| **Precio justo** (promedio sin margen) | 34,6 % | 28,2 % | 37,2 % | — |
+
+- EV de Apuesta Total: local 0,346 × 2,75 − 1 = **−4,8 %**; empate **−1,3 %**; visita **−9,7 %**.
+- Ninguno llega al 2 % → descarte `sin_valor`. Es lo normal: Apuesta Total suele pagar menos.
+
+**Caso hipotético con alerta:** si Apuesta Total pagara 2,60 / 3,30 / **2,95**:
+- Visita: 0,372 × 2,95 − 1 = **+9,7 %** (con Pinnacle sola +10,5 %, con Betfair sola +8,8 %: hay consenso).
+- Cuota 2,95 dentro de 1,50–4,00; diferencia con el precio justo < 10 puntos; Pinnacle reciente y sin moverse en contra.
+- Kelly: 25 % de Kelly = 1,2 % del fondo → con S/ 500 = **S/ 6**.
+- "Solo si la cuota sigue en **2,74** o más" (debajo, el EV cae del 2 %).
+
+## 4. Nuestro modelo (informativo)
+
+**Dixon-Coles**: ataque y defensa por equipo, ventaja de local, corrección de los marcadores bajos
+(0-0, 1-0, 0-1, 1-1), partidos viejos pesan menos (vida media 365 días), ventana de 3 años.
+
+**Elo + regresión logística**: todos empiezan en 1500; sube el que gana (más si fue sorpresa o goleada);
+al empezar temporada cada equipo regresa 1/3 hacia 1500; una logística convierte la diferencia en 3 probabilidades.
+
+Mezcla fija 60 % Dixon-Coles + 40 % Elo. Es lo que aparece en la alerta como "Nuestro modelo (solo informativo)".
+
+**Disponibles para pruebas (no deciden nada):** pi-ratings con goles y con tiros a puerta, y un combinador
+(stacking) que aprende a juntar modelos y mercado. Se activan con `usar_pi`, `usar_pi_tiros` y
+`config/combinador.yaml`. En el backtest no mejoraron.
+
+**Para volver a decidir con el modelo:** `embudo.fuente_probabilidad: modelo` en `estrategia.yaml`
+(sin tocar código). Solo tiene sentido si un backtest nuevo muestra que le gana a Pinnacle.
+
+## 5. Qué dice la alerta
+
+```
+[MODO PRUEBA - no apostar, solo registrar]
+ALERTA DE VALOR - Premier League
+Equipo A vs Equipo B
+sab 28/11 10:00 (hora Lima)
+
+Apuesta: gana Equipo B (visita)
+Cuota Apuesta Total: 2.95
+Prob. justa (Pinnacle + Betfair Exchange): 37.2% | Apuesta Total: 33.0%
+Cuota de Apuesta Total sin cambios hace 25 min
+Nuestro modelo (solo informativo): 34.0%
+Ventaja estimada: +9.7%
+Monto sugerido: S/ 6 (1.2% del fondo)
+Solo si la cuota sigue en 2.74 o mas.
+
+ID: 1287
 ```
 
-Genera `datos/backtest/backtest_E0.md`. Qué mirar, en orden:
+"Prob. justa" es el promedio de las referencias que tenían el partido (si Betfair no lo tiene, dice solo Pinnacle). "Apuesta Total" es la probabilidad que implica su cuota
+(sin su margen): cuanto más baja que la justa, más paga Apuesta Total de lo que debería.
 
-1. **Log loss modelo vs mercado.** Lo normal es que el modelo sea *un poco peor* que el cierre de Pinnacle. Si es mucho peor (diferencia > 0.03), el modelo está flojo para esa liga.
-2. **CLV medio.** Positivo = las cuotas elegidas eran mejores que el cierre. Es la mejor señal de ventaja real. Negativo = mala señal aunque el ROI salga positivo.
-3. **ROI con su margen de error.** Con 100 apuestas a cuota ~2.5, el ROI tiene un error típico de ±10–15%. Un ROI de +8% con 100 apuestas **no prueba nada**.
-4. **Validación.** Los umbrales se eligen con las temporadas de calibración y se prueban en la última, que no se usó para elegir. Si en validación se derrumba, los umbrales "ganadores" eran suerte.
+## 6. Cómo leer un backtest
 
-**Advertencia honesta:** las casas grandes son muy eficientes. Es posible que el backtest muestre
-que no hay ventaja en las ligas principales. Ese también es un resultado útil: evita perder dinero.
-Donde más chance hay es en ligas menos seguidas y en casas "blandas" que se atrasan respecto a Pinnacle.
+```bash
+apuestas comparar --liga E0 --csv datos/football_data/E0_*.csv   # variantes del modelo y el mercado
+apuestas backtest --liga E0                                       # reporte del embudo con búsqueda de umbrales
+```
+
+Qué mirar, en orden:
+
+1. **Log-loss frente al mercado.** Si el modelo es peor que Pinnacle previa, no sirve para decidir.
+2. **CLV medio.** Positivo = las cuotas elegidas eran mejores que el cierre de Pinnacle. Es la mejor señal.
+3. **ROI con su error típico.** Con 100 apuestas a cuota ~2,5 el error es ±10–15 %: un ROI de +8 % no prueba nada.
+4. **Validación.** Umbrales elegidos en unas temporadas y probados en otra. Si se derrumba, eran suerte.
+
+**Limitación del backtest de la estrategia actual:** Apuesta Total no tiene historial público, así que se
+usa Bet365 como sustituto. Bet365 casi nunca paga más que Pinnacle (0–7 alertas por liga en 4,5 temporadas).
+Apuesta Total puede comportarse distinto: **solo se sabe en vivo**, y para eso es el modo prueba.
+Tampoco hay historial de `changedAt` ni de Betfair, así que los filtros 4c y 4d no se pueden backtestear.

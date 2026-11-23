@@ -1,6 +1,9 @@
 # 0003 · Modelo: mezcla Dixon-Coles + Elo
 
-**Estado:** Aceptada · **Fecha:** 2026-11-22
+**Estado:** Ajustada por [0011](0011-probabilidad-desde-pinnacle.md) · **Fecha:** 2026-11-22
+
+> Desde 2026-11-22 el modelo **no decide** las alertas: el backtest mostró que pierde frente a Pinnacle.
+> Sigue entrenándose y aparece en la alerta como dato informativo. Pi-ratings y combinador se probaron y no mejoraron.
 
 ## Contexto
 Hace falta una probabilidad para local, empate y visita que sea razonable, rápida de entrenar en el VPS y explicable.

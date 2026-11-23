@@ -5,6 +5,14 @@
 > a "precio vs Pinnacle" ([ADR 0011](../02-decisiones/0011-probabilidad-desde-pinnacle.md)).
 > Resultados: `resultados-backtest-2026-11.md`. Las fases 2 y 3 quedan en pausa: con este resultado,
 > agregar xG o escenarios al modelo no cambia que el mercado sharp ya sabe más.
+>
+> **Refuerzos hechos en v1.4.0** (no estaban en el plan original; [ADR 0012](../02-decisiones/0012-refuerzos-del-descarte.md)):
+> frescura de cuotas (`changedAt`), consenso Pinnacle + Betfair Exchange, revisión `previa` 12:30 y
+> 1 casa por consulta con respaldo ante error 400. Catálogo completo: `tecnicas-y-herramientas.md`.
+>
+> **Estado de cada punto:** 1.1 pi-ratings 🧪 no mejoró · 1.2 calibración (combinador) 🧪 no mejoró ·
+> 1.3 mezcla con mercado 🧪 no mejoró al mercado solo · 1.4 tiros a puerta 🧪 no mejoró ·
+> 1.5 árboles (CatBoost) ⏸️ no se probó · 1.6 ajuste por liga ⏸️ · 2.1 xG ⏸️ · 2.2 bajas ⏸️ · fase 3 ⏸️.
 
 Objetivo: que las alertas y los descartes sean más finos y se adapten a distintos escenarios,
 **sin** subir la complejidad a ciegas. Cada mejora entra solo si mejora el backtest

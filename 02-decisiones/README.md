@@ -7,12 +7,13 @@ Si una decisión cambia, no se borra el archivo: se crea uno nuevo que la reempl
 |---|---|---|
 | [0001](0001-dos-repositorios.md) | Dos repositorios: sistema y contexto | Aceptada |
 | [0002](0002-supabase-como-base-de-datos.md) | Supabase (Postgres) como base de datos | Aceptada |
-| [0003](0003-modelo-dixon-coles-elo.md) | Modelo: mezcla Dixon-Coles + Elo | Aceptada |
+| [0003](0003-modelo-dixon-coles-elo.md) | Modelo: mezcla Dixon-Coles + Elo | Ajustada por 0011 (informativo) |
 | [0004](0004-n8n-solo-orquesta.md) | El orquestador no calcula; el cálculo vive en la API | Aceptada (el orquestador ahora es systemd, ver 0010) |
-| [0005](0005-valor-no-probabilidad.md) | Decidir por valor esperado, no por probabilidad alta | Aceptada |
+| [0005](0005-valor-no-probabilidad.md) | Decidir por valor esperado, no por probabilidad alta | Aceptada (umbrales 2 % / 3 % desde 0011) |
 | [0006](0006-mensajes-con-plantilla-fija.md) | Mensajes con plantilla fija (Gemini no toca números) | Aceptada |
-| [0007](0007-fuentes-de-datos.md) | Fuentes: football-data.co.uk + OddsPapi | Aceptada |
+| [0007](0007-fuentes-de-datos.md) | Fuentes: football-data.co.uk + OddsPapi (+ Betfair Exchange desde v1.4.0) | Aceptada |
 | [0008](0008-esquema-configurable.md) | Esquema de base de datos configurable (`DB_SCHEMA`) | Aceptada |
 | [0009](0009-envio-centralizado.md) | Envío de mensajes centralizado en el flujo 98 de n8n | Reemplazada por 0010 |
 | [0010](0010-programador-systemd-y-mensajero.md) | Programador con systemd y mensajero con bandeja de salida | Aceptada |
 | [0011](0011-probabilidad-desde-pinnacle.md) | La probabilidad sale de Pinnacle sin margen; el modelo queda informativo | Aceptada |
+| [0012](0012-refuerzos-del-descarte.md) | Refuerzos: frescura de cuotas, consenso con Betfair, revisión 12:30, 1 casa por consulta | Aceptada |

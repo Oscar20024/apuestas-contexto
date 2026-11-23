@@ -1,6 +1,7 @@
 # apuestas-contexto
 
-Contexto, decisiones y documentación del **sistema de predicción de apuestas**.
+Contexto, decisiones y documentación del **sistema de alertas de apuestas** (v1.4.0).
+Busca partidos donde Apuesta Total paga más que el precio justo de Pinnacle y Betfair Exchange.
 El código vive en otro repositorio: **`apuestas-sistema`** (es lo que se despliega en el VPS).
 
 ¿Por qué dos repositorios? Ver [ADR 0001](02-decisiones/0001-dos-repositorios.md).
@@ -13,7 +14,7 @@ El código vive en otro repositorio: **`apuestas-sistema`** (es lo que se despli
 | [01-arquitectura](01-arquitectura/arquitectura.md) | Componentes, flujos y diagramas |
 | [02-decisiones](02-decisiones/) | Decisiones de diseño (ADR) y su porqué |
 | [03-datos](03-datos/modelo-de-datos.md) | Tablas de Supabase y fuentes de datos |
-| [04-modelo](04-modelo/modelo-y-embudo.md) | Cómo predice el modelo y cómo decide el embudo; cómo leer un backtest |
+| [04-modelo](04-modelo/modelo-y-embudo.md) | Cómo decide el embudo (precio justo de Pinnacle + Betfair), [técnicas y herramientas](04-modelo/tecnicas-y-herramientas.md), [resultados del backtest](04-modelo/resultados-backtest-2026-11.md), [plan de mejoras](04-modelo/plan-de-mejoras.md) |
 | [05-operacion](05-operacion/calendario-y-consultas.md) | Calendario, presupuesto de consultas, qué hacer si algo falla y [comandos de uso diario](05-operacion/comandos.md) |
 | [06-guias](06-guias/instalacion-paso-a-paso.md) | Instalación paso a paso y [conexiones](06-guias/conexiones.md) |
 | [preguntas-abiertas.md](preguntas-abiertas.md) | Lo que falta definir |

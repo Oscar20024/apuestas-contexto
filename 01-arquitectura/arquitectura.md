@@ -6,7 +6,7 @@
 flowchart TB
     subgraph Fuentes externas
         FD[football-data.co.uk<br/>historial CSV]
-        OP[OddsPapi<br/>Apuesta Total + Pinnacle]
+        OP[OddsPapi<br/>Apuesta Total + Pinnacle + Betfair Exchange]
     end
 
     subgraph VPS["VPS Hostinger srv1864174 (1 vCPU, 3.8 GB)"]
@@ -40,6 +40,8 @@ flowchart TB
 | Programador | A cada hora fija pide una tarea a la API | Timers de systemd en el VPS |
 | Mensajero | Entrega la bandeja por WhatsApp con `docker exec` a OpenClaw; reintenta | `vps/apuestas_host.py` en el VPS (root) |
 | Supabase | Partidos, cuotas, modelos, evaluaciones, bandeja de mensajes, apuestas reales, uso de API | Proyecto `BDapuestas` (us-west-2) |
+| OddsPapi | Cuotas en vivo: `apuestatotal` (donde se apuesta), `pinnacle` y `betfair-ex` (precio justo). 1 casa por consulta | API externa, plan gratis 250/mes |
+| football-data.co.uk | Historial para entrenar el modelo informativo y para backtests | CSV público |
 | OpenClaw | Sesión de WhatsApp; entrega el texto tal cual | Contenedor existente del VPS |
 | GitHub | Código versionado (`apuestas-sistema`) y contexto (`apuestas-contexto`) | Nube |
 | n8n (opcional) | Podría reemplazar a los timers; no está instalado | — |
@@ -66,10 +68,10 @@ sequenceDiagram
     H->>A: POST /tareas/lunes
     A->>S: resultados, modelo nuevo, resumen a la bandeja
 
-    Note over T: Mar-jue 9:00 · Vie 12:00 · Sáb-dom 6:00 y 10:00
+    Note over T: Mar-jue 9:00 · Vie 12:00 · Sáb-dom 6:00 y 10:00 · 12:30 todos menos viernes
     T->>H: tarea viernes (por ejemplo)
     H->>A: POST /tareas/viernes
-    A->>O: cuotas (2 consultas)
+    A->>O: cuotas: apuestatotal, pinnacle, betfair-ex (3 consultas, 1 por casa)
     A->>S: partidos, cuotas, evaluaciones, alertas a la bandeja
     H->>A: GET /mensajes/pendientes
     H->>C: docker exec openclaw message send
@@ -84,19 +86,24 @@ sequenceDiagram
 
 ```mermaid
 flowchart TB
-    E[Partido + cuotas] --> P1{1. ¿Datos suficientes?<br/>≥10 partidos por equipo}
-    P1 -- no --> D1[Descarte: pocos_datos]
-    P1 -- sí --> P2[2. Probabilidad del modelo<br/>60% Dixon-Coles + 40% Elo]
-    P2 --> P3{3. ¿Hay valor?<br/>EV ≥ 5% finde / 8% entre semana}
-    P3 -- no --> D3[Descarte: sin_valor]
-    P3 -- sí --> P4{4. Riesgo<br/>cuota 1.50–3.50 · diferencia ≤15 pts<br/>Pinnacle no se movió en contra}
-    P4 -- no --> D4[Descarte: cuota_fuera_rango /<br/>ventaja_sospechosa / mercado_en_contra]
+    E[Partido + cuotas de Apuesta Total,<br/>Pinnacle y Betfair] --> P2{2. ¿Hay cuotas de Pinnacle?}
+    P2 -- no --> D2[Descarte: sin_referencia]
+    P2 -- sí --> PJ[Precio justo = promedio sin margen<br/>Pinnacle + Betfair · método potencia]
+    PJ --> P3{3. ¿Apuesta Total paga más?<br/>EV ≥ 2% finde / 3% entre semana<br/>local, empate o visita}
+    P3 -- no --> D3[Descarte: sin_cuotas / sin_valor]
+    P3 -- sí --> P4{4. Riesgo<br/>cuota 1,50–4,00 · diferencia ≤10 pts<br/>Pinnacle cambió hace ≤12 h<br/>Pinnacle y Betfair coinciden<br/>Pinnacle no se movió en contra}
+    P4 -- no --> D4[Descarte: cuota_fuera_rango / ventaja_sospechosa /<br/>referencia_vieja / sin_consenso / mercado_en_contra]
     P4 -- sí --> P5[5. Monto: Kelly 25%, tope 2%]
     P5 --> L{Límites globales<br/>3 alertas/día · 10% semanal<br/>pausa si −15% en el mes}
     L --> AL[Alerta]
 ```
 
+El paso 1 (`pocos_datos`) solo aplica si se vuelve a decidir con el modelo (`fuente_probabilidad: modelo`).
+Nuestro modelo (Dixon-Coles + Elo) se sigue calculando y va en la alerta como dato informativo.
+
 Detalle de cada paso: [04-modelo/modelo-y-embudo.md](../04-modelo/modelo-y-embudo.md).
+Por qué la probabilidad sale del mercado: [ADR 0011](../02-decisiones/0011-probabilidad-desde-pinnacle.md).
+Refuerzos del descarte: [ADR 0012](../02-decisiones/0012-refuerzos-del-descarte.md).
 
 ## Seguridad
 

@@ -8,7 +8,8 @@ Detalle de cada conexión: [conexiones.md](conexiones.md).
 - [x] **B.** Supabase: `BDapuestas` conectado
 - [x] **C.** OddsPapi (key válida, IDs 17/8/23 verificados)
 - [x] **D.** VPS: historial cargado, modelos entrenados, `verificar` 16 ok / 0 avisos, `instalar.sh` hecho (timers activos), `probar-whatsapp` OK
-- [~] **E.** Modo prueba (4–8 semanas) — empieza el lunes 2026-11-23
+- [x] **D2.** Estrategia v1.4.0 desplegada: precio justo Pinnacle + Betfair, 6 timers (incluye `previa` 12:30). Si se agregan timers, volver a correr `sudo bash vps/instalar.sh`
+- [~] **E.** Modo prueba — empieza el lunes 2026-11-23. Medir oportunidades (1–2 semanas) y CLV
 
 Todos los comandos en una sola hoja: [05-operacion/comandos.md](../05-operacion/comandos.md).
 
