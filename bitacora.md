@@ -2,6 +2,16 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-22 · Bundesliga y Ligue 1 activadas
+
+- `config/ligas.yaml`: D1 (OddsPapi 35) y F1 (OddsPapi 34) con `activa: true`. Los IDs son los de Sportradar,
+  igual que 17/8/23 (ya verificados); se confirman con `verificar --con-oddspapi` (1 consulta).
+- **Sin consultas extra:** una consulta cubre hasta 5 ligas por casa. Ahora son 5 ligas activas: es el máximo
+  sin duplicar consultas.
+- ~48 partidos por jornada en vez de ~30: más oportunidades y datos del modo prueba más rápido.
+- Pendiente en el VPS: `historial --ligas D1 F1` y `entrenar --ligas D1 F1` (luego el lunes lo hace solo).
+- Sin backtest de D1/F1: la estrategia de mercado no se puede backtestear bien (no hay historial de Apuesta Total).
+
 ## 2026-11-22 · Documentación al día con v1.4.0
 
 Revisión completa del repo de contexto contra lo que corre en el VPS:

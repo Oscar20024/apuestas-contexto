@@ -13,6 +13,7 @@ Un modelo propio (Dixon-Coles + Elo) se muestra solo como dato informativo (ADR 
 - Orquestación: timers de systemd en el VPS de Hostinger (`srv1864174`). n8n es opcional y no está instalado.
 - Mensajes: la API los deja en `mensajes_salida`; `vps/apuestas_host.py` los entrega con `docker exec openclaw-wr93-openclaw-1 openclaw message send`. Más adelante, quizás una app Android.
 - Base de datos: proyecto Supabase `BDapuestas` (esquema `public`).
+- Ligas activas: Premier (E0), LaLiga (SP1), Serie A (I1), Bundesliga (D1), Ligue 1 (F1). 5 = máximo por consulta de OddsPapi.
 - Zona horaria: America/Lima. Moneda: soles (PEN).
 
 ## Reglas que no se rompen

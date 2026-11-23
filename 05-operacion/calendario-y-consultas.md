@@ -20,7 +20,7 @@ La documentación de OddsPapi dice que se pueden pedir hasta 3 casas juntas, per
 | Configuración | Escaneos/mes | Consultas/mes | De 250 gratis |
 |---|---|---|---|
 | 1–5 ligas, Apuesta Total + Pinnacle | ~61 | ~122 | 49 % |
-| 1–5 ligas, + 1 referencia extra | ~61 | ~183 | 73 % |
+| **1–5 ligas, + 1 referencia extra (actual: 5 ligas + Betfair)** | ~61 | ~183 | 73 % |
 | 6–10 ligas, Apuesta Total + Pinnacle | ~61 | ~244 | **no alcanza** |
 
 Extras: 1 consulta al mes para la lista de equipos (participantes) y las que uses en pruebas.

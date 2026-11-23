@@ -6,7 +6,7 @@ Lo que falta definir. Al resolver una, moverla a "Resueltas" con la fecha y la r
 
 | # | Pregunta | Por qué importa | Valor provisional |
 |---|---|---|---|
-| 2 | ¿Qué ligas te interesan? ¿Incluir Liga 1 de Perú? | Hasta 5 ligas caben en la misma consulta por casa: **2 ligas más no gastan consultas extra**. Pero hoy el escaneo exige que la liga tenga historial en football-data (para reconocer los nombres de los equipos y tener modelo). Liga 1 de Perú no está ahí: habría que cambiar eso | Premier, LaLiga, Serie A (+ Bundesliga y Ligue 1 sin costo extra) |
+| 2 | ¿Incluir Liga 1 de Perú u otras ligas? | Ya hay 5 ligas activas = el máximo que cabe en 1 consulta por casa; una 6.ª liga duplica las consultas y no alcanza el plan gratis. Además el escaneo exige historial en football-data (nombres de equipos y modelo): Liga 1 de Perú no está ahí | E0, SP1, I1, D1, F1 |
 | 3 | ¿Con qué monto de fondo empezarías (soles) y cuál es la apuesta mínima en Apuesta Total? | Define los montos sugeridos | S/ 500 · mínimo S/ 2 |
 | 4 | ¿Registrar apuestas desde WhatsApp (responder "aposte 10 a 2.08")? | Sin registro, el límite de pérdida no funciona | Por comando en el VPS |
 | 5 | ¿Agregar al resumen del lunes cuántas veces Apuesta Total pagó más que el precio justo? | Saber en 1–2 semanas si la estrategia tiene futuro, aunque no haya alertas | Propuesto; mientras, la consulta SQL de `03-datos` |
@@ -28,3 +28,4 @@ Lo que falta definir. Al resolver una, moverla a "Resueltas" con la fecha y la r
 | 2026-11-22 | ¿Número de WhatsApp? | Configurado en `/etc/apuestas/host.env` por `instalar.sh`; envío probado |
 | 2026-11-22 | ¿El modelo propio sirve para decidir? | No: el backtest real pierde frente a Pinnacle. Se decide con el precio justo de Pinnacle + Betfair (ADR 0011, 0012) |
 | 2026-11-22 | ¿Qué casa usar como segunda referencia? | `betfair-ex` (sbobet viejo y caro; singbet sin datos) |
+| 2026-11-22 | ¿Activar más ligas? | Sí: Bundesliga (D1, torneo 35) y Ligue 1 (F1, torneo 34). Sin consultas extra (5 ligas por consulta). ~48 partidos por jornada en vez de ~30 |
