@@ -5,6 +5,13 @@
 > Apuesta Total paga más que ese precio justo. El modelo de abajo sigue entrenándose y aparece en la alerta como
 > dato informativo. Motivo: en el backtest perdía (ver `resultados-backtest-2026-11.md`).
 > Componentes nuevos disponibles para pruebas: pi-ratings (goles y tiros a puerta) y combinador (stacking).
+>
+> **Refuerzos v1.4.0 (filtros extra en el paso 4):**
+> - `referencia_vieja`: si la cuota de Pinnacle no cambia hace más de 12 h, no se confía en ella.
+> - `sin_consenso`: con casas de referencia extra (`oddspapi.casas_referencia_extra`), el precio justo es el
+>   promedio sin margen y **todas** deben ver la ventaja mínima.
+> - La alerta dice qué casas la confirman y hace cuánto no cambia la cuota de Apuesta Total.
+> - Nueva revisión diaria a las 12:30 (`previa`, 8 h) para cuotas que Apuesta Total no actualizó.
 
 ## 1. Cómo predice el modelo
 

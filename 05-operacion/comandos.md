@@ -59,7 +59,8 @@ cd /docker/apuestas-sistema
 tar czf /tmp/football_data.tgz -C datos football_data && chmod 644 /tmp/football_data.tgz
 ```
 ```powershell
-# PC (PowerShell): root no entra por llave; usar el alias
+# PC (PowerShell): usar los alias de ~/.ssh/config (mivps = claude-audit, vpsroot = root)
+# 'root@179.198...' a secas falla porque no indica la llave
 scp mivps:/tmp/football_data.tgz C:\Users\lenovo\Downloads\apuestas-sistema\datos\
 ```
 ```bash
@@ -67,6 +68,14 @@ scp mivps:/tmp/football_data.tgz C:\Users\lenovo\Downloads\apuestas-sistema\dato
 apuestas comparar --liga E0 --csv datos/football_data/E0_*.csv
 apuestas comparar --liga E0 --reusar        # rehace solo las comparaciones (rapido)
 ```
+
+### OddsPapi: casas de referencia (v1.4.0)
+```bash
+# VPS. Cada comando gasta 1 consulta
+docker compose exec apuestas-api python -m apuestas listar-casas --buscar betfair
+docker compose exec apuestas-api python -m apuestas probar-oddspapi --torneo 17 --casa apuestatotal,pinnacle,<otra>
+```
+Si `<otra>` trae cuotas, agregarla en `config/estrategia.yaml` → `oddspapi.casas_referencia_extra` (repo → VPS).
 
 ---
 
