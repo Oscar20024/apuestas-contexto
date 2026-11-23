@@ -2,6 +2,13 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-22 · Tarea `simulacro`: una alerta inventada por WhatsApp
+
+- Nueva tarea `simulacro` (`apuestas-tarea@simulacro.service` o `apuestas tarea simulacro`): encola UNA alerta
+  con la plantilla real, marcada `[SIMULACRO ...]` y `[MODO PRUEBA ...]`. Partido y números inventados.
+- Se guarda en `mensajes_salida` como tipo `prueba`, caduca en 6 h y **no** crea evaluaciones: no ensucia las estadísticas ni el CLV.
+- 59 pruebas (antes 58).
+
 ## 2026-11-22 · Estado al cierre del día — todas las conexiones verificadas
 
 | Pieza | Estado |

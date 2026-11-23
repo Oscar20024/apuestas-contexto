@@ -109,6 +109,7 @@ sudo bash vps/instalar.sh                          # instala/actualiza timers y 
 python3 vps/apuestas_host.py probar-whatsapp       # mensaje directo por OpenClaw
 python3 vps/apuestas_host.py estado                # ¿responde la API?
 sudo systemctl start apuestas-tarea@prueba.service # prueba completa de punta a punta
+sudo systemctl start apuestas-tarea@simulacro.service # UNA alerta inventada (no cuenta en estadísticas)
 systemctl list-timers 'apuestas-*'                 # próximas ejecuciones
 journalctl -u 'apuestas-*' -n 100 --no-pager       # qué pasó
 ```
