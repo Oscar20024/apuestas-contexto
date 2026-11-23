@@ -2,6 +2,17 @@
 
 Formato: fecha · qué cambió · por qué · evidencia (backtest, CLV, etc.).
 
+## 2026-11-23 · v1.4.2 — la tarea espera a que la API arranque
+
+- v1.4.1 desplegada (imagen `apuestas-api:1.4.1`). Al lanzar `apuestas-tarea@previa` justo después de
+  `docker compose up --force-recreate` (18:34 Lima), falló con `ConnectionResetError: [Errno 104] Connection
+  reset by peer`: la API todavía estaba arrancando. No es un error del escaneo.
+- **Corrección:** `vps/apuestas_host.py` ahora llama a `/salud` antes de la tarea y, si la conexión falla,
+  reintenta hasta 6 veces cada 10 s (1 minuto). Solo reintenta errores de conexión; nunca repite la tarea.
+  Evita el mismo problema si un timer coincide con un despliegue.
+- El script del host se lee directo del repo: basta `git pull` (no hace falta reconstruir la imagen para esto).
+- 71 pruebas.
+
 ## 2026-11-23 · v1.4.1 — falla de la primera `previa` y corrección
 
 **Qué pasó:** a las 12:30 la tarea `previa` falló y llegó el aviso por WhatsApp:

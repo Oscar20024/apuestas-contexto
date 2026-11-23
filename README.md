@@ -1,6 +1,6 @@
 # apuestas-contexto
 
-Contexto, decisiones y documentación del **sistema de alertas de apuestas** (v1.4.1).
+Contexto, decisiones y documentación del **sistema de alertas de apuestas** (v1.4.2).
 Busca partidos donde Apuesta Total paga más que el precio justo de Pinnacle y Betfair Exchange.
 El código vive en otro repositorio: **`apuestas-sistema`** (es lo que se despliega en el VPS).
 

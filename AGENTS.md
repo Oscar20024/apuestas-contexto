@@ -6,7 +6,7 @@ Sistema personal de Oscar que busca apuestas de **ganador del partido (1X2)** co
 **Apuesta Total** (Perú). El precio justo de cada resultado sale de **Pinnacle y Betfair Exchange sin
 margen**; si Apuesta Total paga más que ese precio, el sistema manda una alerta por WhatsApp.
 Un modelo propio (Dixon-Coles + Elo) se muestra solo como dato informativo (ADR 0011).
-**Oscar apuesta a mano**; el sistema nunca apuesta. Versión actual: **v1.4.1**.
+**Oscar apuesta a mano**; el sistema nunca apuesta. Versión actual: **v1.4.2**.
 
 - Código: repositorio `apuestas-sistema` (Python 3.12, FastAPI, Docker).
 - Datos: Supabase (Postgres).
@@ -56,7 +56,7 @@ Un modelo propio (Dixon-Coles + Elo) se muestra solo como dato informativo (ADR 
 
 ## Cómo trabajar
 
-- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (70 pruebas).
+- Antes de cambiar código: correr `pytest` en `apuestas-sistema` (71 pruebas).
 - Si algo de conexión falla: `apuestas verificar` antes de tocar código.
 - Después de un cambio importante: anotar en `bitacora.md` (fecha, qué, por qué).
 - Si una decisión cambia la arquitectura: crear un nuevo ADR en `02-decisiones/`.
